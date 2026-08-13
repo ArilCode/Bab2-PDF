@@ -1,98 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Kumpulan PDF Kelompok</title>
-    <link rel="shortcut icon"
-    href="./favicon.png"
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ArilCode — Koleksi PDF Kelompok</title>
+  
+  <!-- SCRIPT ANTI KEDIP TARUH SINI -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('site-theme');
+      // kalau saved = light, baru set. selain itu default dark
+      if (saved === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+      // kalau null atau 'dark' kita ga ngapa-ngapain. biar default :root dark yg jalan
+    })();
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon"
+    href="./Image/favicon.png"
     type="image/x-icon" />
 </head>
 <body>
-    <!-- Navbar -->
+  <header class="site-header">
     <nav class="navbar">
-        <div class="navbar-content">
-            <h1 class="navbar-title">📚 Kumpulan PDF Kelompok</h1>
-        </div>
+      <div class="brand">
+        <a href="#home">ArilCode</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#home">Beranda</a></li>
+        <li><a href="https://my-all-link.vercel.app/">Kontak</a></li>
+        <li><a href="#about">Tentang</a></li>
+      </ul>
+      <div class="actions">
+        <button id="theme-toggle" aria-label="Ganti mode" title="Ganti mode">
+          <!-- icon diubah via JS -->
+        </button>
+      </div>
     </nav>
 
-    <!-- Welcome Section -->
-    <section class="welcome">
-        <div class="welcome-container">
-            <h2 class="welcome-title">Selamat Datang</h2>
-            <p class="welcome-text">Selamat datang di web kumpulan PDF kelompok <span class="highlight">By Aril</span></p>
-            <p class="welcome-subtitle">Silahkan download dokumen yang anda butuhkan di bawah ini</p>
-        </div>
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <h1>Selamat Datang di Arsip PDF Kelompok</h1>
+        <p>Di sini Anda dapat mengunduh dokumen-dokumen kelompok sekolah kami. Pilih dokumen pada bagian Unduhan.</p>
+      </div>
+    </section>
+  </header>
+  
+  <main class="main">
+    <section id="downloads" class="downloads container">
+      <h2>Unduhan Dokumen</h2>
+      <p class="muted">Klik tombol "Unduh" untuk mengambil file PDF Tersedia 5 dokumen</p>
+
+      <div class="cards">
+        <article class="card">
+          <h3>Dokumen Kelompok 1</h3>
+          <p>Ringkasan singkat dokumen 1</p>
+          <div class="card-actions">
+            <a class="btn-outline" href="pdfs/doc1.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dokumen Kelompok 2</h3>
+          <p>Ringkasan singkat dokumen 2</p>
+          <div class="card-actions">
+            <a class="btn-outline" href="pdfs/doc2.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dokumen Kelompok 3</h3>
+          <p>Ringkasan singkat dokumen 3</p>
+          <div class="card-actions">
+            <a class="btn-outline" href="pdfs/doc3.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dokumen Kelompok 4</h3>
+          <p>Ringkasan singkat dokumen 4</p>
+          <div class="card-actions">
+            <a class="btn-outline" href="pdfs/doc4.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dokumen Kelompok 5</h3>
+          <p>Ringkasan singkat dokumen 5</p>
+          <div class="card-actions">
+            <a class="btn-outline" href="pdfs/doc5.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+        </article>
+      </div>
     </section>
 
-    <!-- Download Buttons Section -->
-    <section class="download-section">
-        <div class="download-container">
-            <h3 class="section-title">Dokumen Tersedia</h3>
-            
-            <div class="pdf-grid">
-                <!-- PDF 1 -->
-                <div class="pdf-card">
-                    <div class="pdf-icon">📄</div>
-                    <h4 class="pdf-title">Dokumen kelompok 1</h4>
-                    <p class="pdf-description">PPT Kelompok 1</p>
-                    <a href="./pdf/klasifikasiKelompokSosial-TidakTeraturKerumunan.pdf" download class="download-btn">
-                        <span>⬇️</span> Download
-                    </a>
-                </div>
-
-                <!-- PDF 2 -->
-                <div class="pdf-card">
-                    <div class="pdf-icon">📄</div>
-                    <h4 class="pdf-title">Dokumen kelompok 2</h4>
-                        <p class="pdf-description">PPT Kelompok 2</p>
-                    <a href="./pdf/klasifikasiKelompokSosial-TidakTeraturMasaDanPublik.pdf" download class="download-btn">
-                        <span>⬇️</span> Download
-                    </a>
-                </div>
-
-                <!-- PDF 3 -->
-                <div class="pdf-card">
-                    <div class="pdf-icon">📄</div>
-                    <h4 class="pdf-title">Dokumen kelompok 3</h4>
-                    <p class="pdf-description">PPT Kelompok 3</p>
-                    <a href="./pdf/klasifikasiKelompokSosial-TeraturInGroupDanOutGroup.pdf" download class="download-btn">
-                        <span>⬇️</span> Download
-                    </a>
-                </div>
-
-                <!-- PDF 4 -->
-                <div class="pdf-card">
-                    <div class="pdf-icon">📄</div>
-                    <h4 class="pdf-title">Dokumen kelompok 4</h4>
-                    <p class="pdf-description">PPT Kelompok 4</p>
-                    <a href="./pdf/klasifikasiKelompokSosial-TeraturPatembayanDanPaguyuban.pdf" download class="download-btn">
-                        <span>⬇️</span> Download
-                    </a>
-                </div>
-
-                <!-- PDF 5 -->
-                <div class="pdf-card">
-                    <div class="pdf-icon">📄</div>
-                    <h4 class="pdf-title">Dokumen kelompok 5</h4>
-                    <p class="pdf-description">PPT Kelompok 5</p>
-                    <a href="./pdf/klasifikasiKelompokSosial-TeraturSolidaritasMekanikDanOrganik.pdf" download class="download-btn">
-                        <span>⬇️</span> Download
-                    </a>
-                </div>
-            </div>
-        </div>
+    <section id="about" class="about container">
+      <h2>Tentang</h2>
+      <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses dokumen PDF yang berkaitan dengan tugas kelompok</p>
     </section>
+  </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2026 Kumpulan PDF Kelompok By Aril. All rights reserved.</p>
-            <p>Dibuat dengan ikhlas untuk memudahkan akses dokumen</p>
-        </div>
-    </footer>
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 ArilCode — Arsip PDF Kelompok Sekolah</p>
+    </div>
+  </footer>
 
-    <script src="script.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

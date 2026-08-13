@@ -1,293 +1,317 @@
-@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Changa+One:ital@0;1&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root{
+  /* INI JADI DEFAULT DARK */
+  --bg-1: #0f1724;
+  --bg-2: #0b1220;
+  --card: #0b1624;
+  --text: #e6eef8;
+  --muted: #98a7bd;
+  --accent: #6ea8ff;
+  --footer: #071023;
+  --glass: rgba(255,255,255,0.03);
+  --btn-download: #2E7D32; /* tombol unduh hijau di dark */
+  --btn-download-hover: #1B5E20;
 }
 
-:root {
-    --primary-color: #4f46e5;
-    --secondary-color: #10b981;
-    --dark-bg: #1f2937;
-    --light-bg: #f9fafb;
-    --text-dark: #111827;
-    --text-light: #6b7280;
-    --border-color: #e5e7eb;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+/* SMOOTH TRANSISI DARK/LIGHT */
+:root, 
+body,
+.navbar,
+.hero,
+.card,
+.site-footer,
+.btn-outline,
+.about,
+.nav-links a {
+  transition: 
+    background-color 1.5s ease-in-out,
+    background 1.5s ease-in-out,
+    color 1.5s ease-in-out,
+    border-color 1.5s ease-in-out,
+    box-shadow 1.5s ease-in-out;
+}
+
+[data-theme="light"]{ /* INI JADI OVERRIDE KALAU LIGHT */
+  --bg-1: #f6f8fb;
+  --bg-2: #e8f1ff;
+  --card: #ffffff;
+  --text: #102a43;
+  --muted: #52667a;
+  --accent: #4c8cff;
+  --footer: #f1f5f9;
+  --glass: rgba(255,255,255,0.6);
+  --btn-download: #1565c0; /* tombol unduh biru di light */
+  --btn-download-hover: #0D47A1;
+}
+
+
+
+/* cegah kedip pas load */
+.preload * {
+  transition: none !important;
+}
+
+* { 
+  box-sizing: border-box; 
 }
 
 html {
-    scroll-behavior: smooth;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(76,140,255,0.06), transparent 8%),
+    radial-gradient(900px 500px at 95% 90%, rgba(76,140,255,0.04), transparent 8%),
+    linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  background-attachment: fixed;
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: "Tinos", serif;
-    font-weight: 400;
-    font-style: normal;
-    background-color: var(--light-bg);
-    color: var(--text-dark);
-    line-height: 1.6;
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+  background: transparent;  padding-top: 100px;
+  transition: background-color .25s ease, color .25s ease;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 10px 10px;
+  pointer-events: none;
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 /* Navbar */
-.navbar {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-    padding: 1.5rem 0;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
-.navbar-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+.navbar { /* INI JADI DEFAULT DARK */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 10px;
+  margin: 1rem;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
 }
 
-.navbar-title {
-    font-family: "Fjalla One", sans-serif;
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+[data-theme="light"] .navbar { /* INI UNTUK LIGHT MODE */
+  background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.12));
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
 }
 
-/* Welcome Section */
-.welcome {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-    padding: 4rem 1rem;
-    text-align: center;
+.brand a { 
+  font-weight: 700;
+  color: var(--text); text-decoration: none; font-size: 1.1rem;
 }
 
-.welcome-container {
-    max-width: 800px;
-    margin: 0 auto;
+.nav-links {
+  list-style: none; 
+  display: flex; 
+  gap: 1rem; 
+  margin: 0; 
+  padding: 0;
 }
 
-.welcome-title {
-    font-family: "Changa One", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.nav-links a { 
+  color: var(--muted); 
+  text-decoration: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px; 
 }
 
-.welcome-text {
-    font-size: 1.25rem;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+.nav-links a:hover {
+  background: var(--glass);
+  color: var(--text); 
 }
 
-.welcome-text .highlight {
-    color: var(--secondary-color);
-    font-weight: 700;
+#theme-toggle { 
+  background: transparent; 
+  border: 0; 
+  cursor: pointer; 
+  width: 40px; 
+  height: 40px; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-radius: 8px; 
+  color: var(--muted);
 }
 
-.welcome-subtitle {
-    font-size: 1rem;
-    color: var(--text-light);
-    margin-top: 1.5rem;
+#theme-toggle:hover { 
+  background: var(--glass);
 }
 
-/* Download Section */
-.download-section {
-    padding: 4rem 1rem;
-    background-color: white;
+section {
+  scroll-margin-top: 120px;
 }
 
-.download-container {
-    max-width: 1200px;
-    margin: 0 auto;
+/* Hero - UDAH CENTER DI LAYAR LEBAR */
+.hero {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
+border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  margin: .5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 320px;
+  max-width: 1100px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
 }
 
-.section-title {
-    font-size: 2rem;
-    color: var(--text-dark);
-    margin-bottom: 3rem;
-    text-align: center;
-    font-weight: 700;
+[data-theme="light"] .hero { /* UNTUK LIGHT */
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
-/* PDF Grid */
-.pdf-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
+.hero-content {
+  max-width: 800px; 
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
 }
 
-.pdf-card {
-    background: white;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
+.hero h1 { 
+  font-size: 2rem; 
+  margin: 0 0 0.5rem;
 }
 
-.pdf-card:hover {
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow);
-    transform: translateY(-8px);
+.hero p {
+  margin: 0 0 1rem;
+  color: var(--muted);
 }
 
-.pdf-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+/* Downloads */
+.downloads {
+  padding: 2rem 1rem;
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
+.downloads h2 {
+  margin-top: 0; 
+  text-align: center; 
 }
 
-.pdf-card:hover .pdf-icon {
-    animation: float 2s ease-in-out infinite;
+.muted { 
+  color: var(--muted);
 }
 
-.pdf-title {
-    font-size: 1.25rem;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+.cards { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; 
+  margin-top: 1rem; 
 }
 
-.pdf-description {
-    color: var(--text-light);
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
+.card { /* DEFAULT DARK */
+  background: var(--card);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6); 
 }
 
-.download-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    font-size: 1rem;
+[data-theme="light"] .card { /* UNTUK LIGHT */
+  box-shadow: 0 6px 18px rgba(2,6,23,0.04);
 }
 
-.download-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+.card h3 { 
+  margin: 0 0 0.5rem; 
+  text-align: center; 
 }
 
-.download-btn:active {
-    transform: scale(0.98);
+.card p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.card-actions { 
+  display: flex; 
+  gap: 0.5rem; 
+  align-items: center; 
+  justify-content: center; 
+} /* center tombol */
+
+.btn-outline {
+  background: var(--btn-download);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background .2s ease;
+}
+
+.btn-outline:hover {
+  background: var(--btn-download-hover);
+}
+
+.about {
+  max-width: 100%;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  transition: all 0.4s ease; /* biar animasinya halus */
+  border: 2px solid transparent;
+}
+
+.about.active { /* DEFAULT DARK */
+  background: linear-gradient(135deg, rgba(110, 168, 255, 0.15), rgba(110, 168, 255, 0.05));
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 25px rgba(110, 168, 255, 0.25);
+}
+
+[data-theme="light"] .about.active { /* UNTUK LIGHT */
+  background: linear-gradient(135deg, rgba(76, 140, 255, 0.15), rgba(76, 140, 255, 0.05));
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 25px rgba(76, 140, 255, 0.25);
 }
 
 /* Footer */
-.footer {
-    background-color: var(--dark-bg);
-    color: white;
+.site-footer {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--footer);
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width:720px) {
+  .site-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+  }
+  
+  .nav-links {
+    display: none; 
+  }
+  
+  .main {
+    padding-top: 210px;
+  }
+  
+  .navbar {
+    padding: 0.5rem 0.8rem;
+    margin: .5rem;
+  }
+  .hero {
     padding: 2rem 1rem;
-    text-align: center;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-content p {
-    margin: 0.5rem 0;
-    font-size: 0.95rem;
-    color: #d1d5db;
-}
-
-.footer-content p:first-child {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .navbar-title {
-        font-size: 1.25rem;
-    }
-
-    .welcome-title {
-        font-size: 2rem;
-    }
-
-    .welcome-text {
-        font-size: 1rem;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-    }
-
-    .pdf-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .pdf-card {
-        padding: 1.5rem;
-    }
-
-    .pdf-icon {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .navbar-title {
-        font-size: 1rem;
-    }
-
-    .welcome {
-        padding: 2rem 1rem;
-    }
-
-    .welcome-title {
-        font-size: 1.5rem;
-    }
-
-    .welcome-text {
-        font-size: 0.95rem;
-    }
-
-    .download-section {
-        padding: 2rem 1rem;
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-    }
-
-    .pdf-card {
-        padding: 1rem;
-    }
-
-    .pdf-icon {
-        font-size: 2rem;
-    }
-
-    .pdf-title {
-        font-size: 1rem;
-    }
-
-    .download-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-    }
+    min-height: 260px;
+  }
 }
