@@ -77,3 +77,45 @@ aboutSection.addEventListener('click', () => {
 });
 
 document.querySelector('.nav-links a[href="#home"]').classList.add('active');
+
+
+
+// CEK FILE PDF SEBELUM DOWNLOAD
+const popup = document.getElementById('popup');
+const popupText = document.getElementById('popup-text');
+const popupClose = document.querySelector('.popup-close');
+const downloadBtns = document.querySelectorAll('.btn-outline[href$=".pdf"]');
+const body = document.body; // TAMBAH INI
+
+function showPopup(message) {
+  popupText.textContent = message;
+  popup.classList.remove('hidden');
+  body.classList.add('no-scroll'); // KUNCI SCROLL
+}
+
+function hidePopup() {
+  popup.classList.add('hidden');
+  body.classList.remove('no-scroll'); // BUKA SCROLL LAGI
+}
+
+popupClose.addEventListener('click', hidePopup);
+popup.addEventListener('click', (e) => {
+  if (e.target === popup) hidePopup(); // klik di luar juga nutup + buka scroll
+});
+
+downloadBtns.forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const url = btn.getAttribute('href');
+    
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      if (!res.ok) {
+        e.preventDefault();
+        showPopup('file belum bisa di akses');
+      }
+    } catch (err) {
+      e.preventDefault();
+      showPopup('file belum ada / gagal memuat');
+    }
+  });
+});

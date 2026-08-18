@@ -1,27 +1,25 @@
 <!doctype html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ArilCode — Koleksi PDF Kelompok</title>
   
-  <!-- SCRIPT ANTI KEDIP TARUH SINI -->
+  <!-- SCRIPT ANTI KEDIP -->
   <script>
     (function() {
       const saved = localStorage.getItem('site-theme');
-      // kalau saved = light, baru set. selain itu default dark
       if (saved === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
       }
-      // kalau null atau 'dark' kita ga ngapa-ngapain. biar default :root dark yg jalan
     })();
   </script>
-
+  
   <link rel="stylesheet" href="style.css" />
-  <link rel="shortcut icon"
-    href="./Image/favicon.png"
-    type="image/x-icon" />
+  <link rel="shortcut icon" href="./Image/favicon.png" type="image/x-icon" />
 </head>
+
 <body>
   <header class="site-header">
     <nav class="navbar">
@@ -35,11 +33,10 @@
       </ul>
       <div class="actions">
         <button id="theme-toggle" aria-label="Ganti mode" title="Ganti mode">
-          <!-- icon diubah via JS -->
         </button>
       </div>
     </nav>
-
+    
     <section id="home" class="hero">
       <div class="hero-content">
         <h1>Selamat Datang di Arsip PDF Kelompok</h1>
@@ -52,62 +49,107 @@
     <section id="downloads" class="downloads container">
       <h2>Unduhan Dokumen</h2>
       <p class="muted">Klik tombol "Unduh" untuk mengambil file PDF Tersedia 5 dokumen</p>
-
+      
       <div class="cards">
         <article class="card">
           <h3>Dokumen Kelompok 1</h3>
-          <p>Dokumen PDF 1</p>
+          <p>Ringkasan singkat dokumen 1</p>
           <div class="card-actions">
             <a class="btn-outline" href="pdfs/doc1.pdf" download target="_blank">Unduh PDF</a>
           </div>
+          <div class="member-avatars">
+            <span class="avatar" data-name="Rivaldo">R</span>
+            <span class="avatar" data-name="Irsyad">I</span>
+            <span class="avatar" data-name="Seno">S</span>
+            <span class="avatar" data-name="Resa">R</span>
+            <span class="avatar" data-name="Bagas">B</span>
+            <span class="avatar" data-name="Jona">J</span>
+            <span class="avatar" data-name="Rafi">R</span>
+          </div>
         </article>
-
+        
         <article class="card">
           <h3>Dokumen Kelompok 2</h3>
-          <p>Dokumen PDF 2</p>
+          <p>Ringkasan singkat dokumen 2</p>
           <div class="card-actions">
             <a class="btn-outline" href="pdfs/doc2.pdf" download target="_blank">Unduh PDF</a>
           </div>
+          <div class="member-avatars">
+            <span class="avatar" data-name="Aril">A</span>
+            <span class="avatar" data-name="Fandi">F</span>
+            <span class="avatar" data-name="Andre">A</span>
+            <span class="avatar" data-name="Sandi">S</span>
+            <span class="avatar" data-name="Yuda">Y</span>
+            <span class="avatar" data-name="Agri">A</span>
+          </div>
         </article>
-
+        
         <article class="card">
           <h3>Dokumen Kelompok 3</h3>
-          <p>Dokumen PDF 3</p>
+          <p>Ringkasan singkat dokumen 3</p>
           <div class="card-actions">
             <a class="btn-outline" href="pdfs/doc3.pdf" download target="_blank">Unduh PDF</a>
           </div>
+          <div class="member-avatars">
+            <span class="avatar" data-name="Keyla">K</span>
+            <span class="avatar" data-name="Selvia">S</span>
+            <span class="avatar" data-name="Meisya">M</span>
+            <span class="avatar" data-name="Petra">P</span>
+          </div>
         </article>
-
+        
         <article class="card">
           <h3>Dokumen Kelompok 4</h3>
-          <p>Dokumen PDF 4</p>
+          <p>Ringkasan singkat dokumen 4</p>
           <div class="card-actions">
             <a class="btn-outline" href="pdfs/doc4.pdf" download target="_blank">Unduh PDF</a>
           </div>
+          <div class="member-avatars">
+            <span class="avatar" data-name="Aini">A</span>
+            <span class="avatar" data-name="Olvi">O</span>
+            <span class="avatar" data-name="Santiya">S</span>
+            <span class="avatar" data-name="Nur aini">N</span>
+          </div>
         </article>
-
+        
         <article class="card">
           <h3>Dokumen Kelompok 5</h3>
-          <p>Dokumen PDF 5</p>
+          <p>Ringkasan singkat dokumen 5</p>
           <div class="card-actions">
             <a class="btn-outline" href="pdfs/doc5.pdf" download target="_blank">Unduh PDF</a>
+          </div>
+          <div class="member-avatars">
+            <span class="avatar" data-name="Mayya">M</span>
+            <span class="avatar" data-name="Anggun">A</span>
+            <span class="avatar" data-name="Adila">A</span>
+            <span class="avatar" data-name="Meta">M</span>
+            <span class="avatar" data-name="Annisa">A</span>
           </div>
         </article>
       </div>
     </section>
-
+    
     <section id="about" class="about container">
       <h2>Tentang</h2>
-      <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses Dokumen PDF  yang berkaitan dengan tugas kelompok</p>
+      <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses Dokumen PDF yang berkaitan dengan tugas kelompok</p>
     </section>
   </main>
-
+  
   <footer class="site-footer">
     <div class="container">
       <p>© 2026 ArilCode — Arsip PDF Kelompok Sekolah</p>
     </div>
   </footer>
-
+  
+  
+  <div id="popup" class="popup hidden">
+    <div class="popup-content">
+      <span class="popup-close">&times;</span>
+      <p id="popup-text">file belum bisa di akses</p>
+    </div>
+  </div>
+  
   <script src="main.js"></script>
 </body>
+
 </html>
