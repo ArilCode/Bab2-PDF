@@ -335,16 +335,23 @@ section {
   border: 2px solid transparent;
 }
 
-.about .active {
+/* FIX: hapus spasi */
+.about.active {
   background: linear-gradient(135deg, rgba(110, 168, 255, 0.15), rgba(110, 168, 255, 0.05));
   border: 2px solid var(--accent);
   box-shadow: 0 0 25px rgba(110, 168, 255, 0.25);
 }
 
-[data-theme="light"] .about .active {
+[data-theme="light"] .about.active {
   background: linear-gradient(135deg, rgba(76, 140, 255, 0.15), rgba(76, 140, 255, 0.05));
   border: 2px solid var(--accent);
   box-shadow: 0 0 25px rgba(76, 140, 255, 0.25);
+}
+
+/* TAMBAH: biar menu yg diklik ada warnanya */
+.nav-links a.active {
+  background: var(--glass);
+  color: var(--text);
 }
 
 /* Footer */
@@ -356,32 +363,8 @@ section {
   color: var(--muted);
 }
 
-@media (max-width:720px) {
-  .site-header {
-    position: fixed;
-    left: 0;
-    right: 0;
-  }
-  
-  .nav-links {
-    display: none; 
-  }
-  
-  .main {
-    padding-top: 210px;
-  }
-  
-  .navbar {
-    padding: 0.5rem 0.8rem;
-    margin: .5rem;
-  }
-  .hero {
-    padding: 2rem 1rem;
-    min-height: 260px;
-  }
-}
+/* pop up */
 
-/* POPUP */
 .popup {
   position: fixed;
   top: 0; left: 0;
@@ -430,7 +413,31 @@ section {
   color: var(--text);
 }
 
-/* LOCK SCROLL SAAT POPUP MUNCUL */
 body.no-scroll {
   overflow: hidden;
+}
+
+@media (max-width:720px) {
+  .site-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+  }
+  
+  .nav-links {
+    display: none; 
+  }
+  
+  .main {
+    padding-top: 210px;
+  }
+  
+  .navbar {
+    padding: 0.5rem 0.8rem;
+    margin: .5rem;
+  }
+  .hero {
+    padding: 2rem 1rem;
+    min-height: 260px;
+  }
 }
