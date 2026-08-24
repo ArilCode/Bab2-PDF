@@ -231,7 +231,8 @@ section {
   display: flex; 
   gap: 0.5rem; 
   align-items: center; 
-  justify-content: center; 
+  justify-content: center;
+  flex-wrap: wrap; /* TAMBAH INI */
 }
 
 .btn-outline {
