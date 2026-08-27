@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+
 :root{
   --bg-1: #0f1724;
   --bg-2: #0b1220;
@@ -52,7 +54,7 @@ html {
 
 body {
   margin: 0;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: 'Patrick Hand', cursive;
   color: var(--text);
   background: transparent;
   padding-top: 100px;
