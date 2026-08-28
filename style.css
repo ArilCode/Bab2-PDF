@@ -1,6 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
-
-:root{
+/* ============================================
+   CSS VARIABLES & THEME DEFINITIONS
+   Defines color palette for dark and light themes using CSS custom properties
+============================================ */
+:root {
   --bg-1: #0f1724;
   --bg-2: #0b1220;
   --card: #0b1624;
@@ -8,7 +10,7 @@
   --muted: #98a7bd;
   --accent: #6ea8ff;
   --footer: #071023;
-  --glass: rgba(255,255,255,0.03);
+  --glass: rgba(255, 255, 255, 0.03);
   --btn-download: #2E7D32;
   --btn-download-hover: #1B5E20;
   --avatar-bg: #1565c0;
@@ -16,10 +18,18 @@
   --avatar-border: #ffffff;
 }
 
+/* ============================================
+   GLOBAL TRANSITIONS
+   Applies smooth transitions for theme switching across main elements
+============================================ */
 :root, body, .navbar, .hero, .card, .site-footer, .btn-outline, .about, .nav-links a {
   transition: background-color 1.5s ease-in-out, background 1.5s ease-in-out, color 1.5s ease-in-out, border-color 1.5s ease-in-out, box-shadow 1.5s ease-in-out;
 }
 
+/* ============================================
+   LIGHT THEME OVERRIDES
+   Overrides CSS variables when [data-theme="light"] is active
+============================================ */
 [data-theme="light"] {
   --bg-1: #f6f8fb;
   --bg-2: #e8f1ff;
@@ -28,23 +38,29 @@
   --muted: #52667a;
   --accent: #4c8cff;
   --footer: #f1f5f9;
-  --glass: rgba(255,255,255,0.6);
+  --glass: rgba(0,0,0,0.05);
   --btn-download: #1565c0;
   --btn-download-hover: #0D47A1;
   --avatar-bg: #2E7D32;
   --avatar-bg-hover: #1B5E20;
-  --avatar-border: #000000;
+  --avatar-border: rgba(0,0,0,0.5);
 }
 
+/* Disable transitions during page load to prevent flicker */
 .preload * {
   transition: none !important;
 }
 
+/* ============================================
+   BASE STYLES & RESET
+   Global box-sizing and base layout setup
+============================================ */
 * { 
   box-sizing: border-box; 
 }
 
 html {
+  /* Layered background with radial gradients and linear gradient */
   background: radial-gradient(1200px 600px at 10% 10%, rgba(76,140,255,0.06), transparent 8%),
     radial-gradient(900px 500px at 95% 90%, rgba(76,140,255,0.04), transparent 8%),
     linear-gradient(180deg,var(--bg-1),var(--bg-2));
@@ -57,10 +73,11 @@ body {
   font-family: 'Patrick Hand', cursive;
   color: var(--text);
   background: transparent;
-  padding-top: 100px;
+  padding-top: 100px; /* Offset for sticky navbar */
   transition: background-color .25s ease, color .25s ease;
 }
 
+/* Subtle grid pattern overlay for texture */
 body::before {
   content: "";
   position: fixed;
@@ -72,13 +89,221 @@ body::before {
   mix-blend-mode: overlay;
 }
 
+/* Prevent body scroll when lock screen is active */
+body.locked {
+  overflow: hidden;
+}
+
+/* ============================================
+   LOCK SCREEN SECTION
+   Full-screen overlay displayed before site launch date
+============================================ */
+.lock-screen {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100vh;
+  background: var(--bg-1);
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  z-index: 9999; 
+  text-align: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.lock-box { 
+  border: 3px solid var(--muted);
+  padding: 25px 20px;
+  background: var(--card);
+  box-shadow: 5px 5px 0 var(--muted);
+  width: 100%;
+  max-width: 380px;
+  border-radius: 8px;
+}
+
+/* Animated hourglass icon using pseudo-element */
+.hourglass {
+  display: inline-block;
+  font-size: 2rem;
+  vertical-align: middle;
+}
+
+.hourglass::before {
+  content: "⌛";
+  display: inline-block;
+  animation: hourglass-spin 2s infinite;
+}
+
+@keyframes hourglass-spin {
+ 0%   { content: "⌛"; transform: rotate(0deg); } 
+ 25%  { content: "⌛"; transform: rotate(0deg); }
+ 50%  { content: "⏳"; transform: rotate(180deg); }
+ 75%  { content: "⏳"; transform: rotate(180deg); }
+ 100% { content: "⌛"; transform: rotate(360deg); }
+}
+
+/* Quick access form elements */
+.lock-box input { 
+  padding: 10px; 
+  border: 2px solid var(--muted);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 1.1rem; 
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+  
+.lock-box button { 
+  padding: 10px 25px; 
+  background: var(--btn-download);
+  color: var(--text); 
+  cursor: pointer; 
+  font-size: 1.1rem;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.lock-box button:hover {
+  background: var(--btn-download-hover);
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+/* Password visibility toggle icon */
+#togglePassword {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+#togglePassword:hover { color: #000; }
+
+.akses-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.akses-box label {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.akses-box button {
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Error message with smooth show/hide transition */
+.error { 
+  color: red; 
+  margin: 0 0 0 0;
+  font-size: 0.9rem;
+  height: 0;           
+  opacity: 0;          
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.error.show { 
+  height: 18px;        
+  opacity: 1;
+  margin-top: 5px;
+}
+
+/* Countdown timer display */
+#timer {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  margin: 15px 0; 
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+#timer span { 
+  display: inline-block; 
+  min-width: 55px; 
+  border: 2px solid var(--muted);
+  background: var(--card);
+  padding: 6px; 
+  border-radius: 4px;
+}
+
+/* Marquee animation for announcement text */
+.marquee-box {
+  width: 100%;
+  margin-top: 15px;
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.marquee-box span {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--text);
+  white-space: nowrap;
+  width: max-content;
+  animation: jalan-balik 2.5s linear infinite alternate;
+}
+
+@keyframes jalan-balik {
+ 0%   { transform: translateX(33%); }
+ 100% { transform: translateX(-33%); }
+}
+
+.credit {
+  margin-top: 8px;
+  margin-left: auto;
+  width: fit-content;
+  padding-right: 5px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ============================================
+   MAIN CONTENT SECTION
+   Hidden by default, revealed after lock screen
+============================================ */
+#mainContent { 
+  display: none;
+}
+
 .container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-/* Navbar */
+/* ============================================
+   HEADER & NAVIGATION
+   Sticky navbar with glassmorphism effect
+============================================ */
 .site-header {
   position: sticky;
   top: 0;
@@ -106,7 +331,9 @@ body::before {
 
 .brand a { 
   font-weight: 700;
-  color: var(--text); text-decoration: none; font-size: 1.1rem;
+  color: var(--text); 
+  text-decoration: none; 
+  font-size: 1.1rem;
 }
 
 .nav-links {
@@ -129,27 +356,33 @@ body::before {
   color: var(--text); 
 }
 
-#theme-toggle { 
-  background: transparent; 
-  border: 0; 
-  cursor: pointer; 
-  width: 40px; 
-  height: 40px; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  border-radius: 8px; 
+/* Theme toggle button for switching dark/light mode */
+#theme-toggle {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   color: var(--muted);
 }
 
-#theme-toggle:hover { 
-  background: var(--glass);
+#theme-toggle:hover {
+  background: transparent;
 }
 
+/* Offset for anchor links to account for sticky header */
 section {
   scroll-margin-top: 120px;
 }
 
+/* ============================================
+   HERO SECTION
+   Main welcome banner with glassmorphism background
+============================================ */
 .hero {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -188,7 +421,10 @@ section {
   color: var(--muted);
 }
 
-/* Downloads */
+/* ============================================
+   DOWNLOADS SECTION
+   Grid layout for PDF document cards
+============================================ */
 .downloads {
   padding: 2rem 1rem;
 }
@@ -202,9 +438,11 @@ section {
   color: var(--muted);
 }
 
+/* Responsive grid for document cards */
 .cards { 
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  gap: 1rem; 
   margin-top: 1rem; 
 }
 
@@ -234,9 +472,10 @@ section {
   gap: 0.5rem; 
   align-items: center; 
   justify-content: center;
-  flex-wrap: wrap; /* TAMBAH INI */
+  flex-wrap: wrap;
 }
 
+/* Primary download button styling */
 .btn-outline {
   background: var(--btn-download);
   color: #fff;
@@ -252,6 +491,10 @@ section {
   background: var(--btn-download-hover);
 }
 
+/* ============================================
+   MEMBER AVATARS
+   Circular avatars with hover tooltip showing member names
+============================================ */
 .member-avatars {
   display: flex;
   align-items: center;
@@ -288,6 +531,7 @@ section {
   border-color: var(--btn-download);
 }
 
+/* Tooltip displaying data-name attribute */
 .avatar::after {
   content: attr(data-name);
   position: absolute;
@@ -309,6 +553,7 @@ section {
   z-index: 20;
 }
 
+/* Tooltip arrow */
 .avatar::before {
   content: '';
   position: absolute;
@@ -329,6 +574,10 @@ section {
   bottom: -32px;
 }
 
+/* ============================================
+   ABOUT SECTION
+   Information section with active state highlight
+============================================ */
 .about {
   max-width: 100%;
   text-align: center;
@@ -338,7 +587,6 @@ section {
   border: 2px solid transparent;
 }
 
-/* FIX: hapus spasi */
 .about.active {
   background: linear-gradient(135deg, rgba(110, 168, 255, 0.15), rgba(110, 168, 255, 0.05));
   border: 2px solid var(--accent);
@@ -351,14 +599,15 @@ section {
   box-shadow: 0 0 25px rgba(76, 140, 255, 0.25);
 }
 
-/* TAMBAH: biar menu yg diklik ada warnanya */
 .nav-links a.active {
   background: var(--glass);
   color: var(--text);
 }
 
-/* Footer */
-
+/* ============================================
+   FOOTER SECTION
+   Site footer with copyright information
+============================================ */
 .site-footer {
   margin-top: 2rem;
   padding: 1.25rem;
@@ -366,8 +615,10 @@ section {
   color: var(--muted);
 }
 
-/* pop up */
-
+/* ============================================
+   GLOBAL POPUP MODAL
+   Overlay modal for notifications and avatar info
+============================================ */
 .popup {
   position: fixed;
   top: 0; left: 0;
@@ -412,6 +663,7 @@ section {
   color: var(--muted);
   cursor: pointer;
 }
+
 .popup-close:hover {
   color: var(--text);
 }
@@ -420,7 +672,46 @@ body.no-scroll {
   overflow: hidden;
 }
 
+/* ============================================
+   RESPONSIVE MEDIA QUERIES
+   Adjustments for tablets and mobile devices
+============================================ */
+@media (max-width: 400px) {
+  .lock-box {
+    padding: 20px 15px;
+    box-shadow: 3px 3px 0 #333;
+  }
+  
+  #timer span {
+    min-width: 45px;
+    font-size: 0.9rem;
+  }
+  
+  .lock-box h2 {
+    font-size: 1.2rem;
+  }
+  
+  .popup-content {
+    padding: 1rem;
+    width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 16px;
+  }
+  
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+}
+
 @media (max-width:720px) {
+  body {
+    padding-top: 200px;
+  }
+  
   .site-header {
     position: fixed;
     left: 0;
@@ -428,11 +719,11 @@ body.no-scroll {
   }
   
   .nav-links {
-    display: none; 
+    display: none; /* Hidden on mobile, add hamburger menu later */
   }
   
   .main {
-    padding-top: 210px;
+    padding-top: 120px;
   }
   
   .navbar {
