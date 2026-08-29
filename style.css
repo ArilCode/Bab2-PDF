@@ -94,6 +94,12 @@ body.locked {
   overflow: hidden;
 }
 
+/* ANTI KEDIP: KONTROL DARI HTML CLASS */
+html.locked #mainContent{display:none!important}
+html.locked #lockScreen{display:flex!important}
+#mainContent{display:block}
+#lockScreen{display:none}
+
 /* ============================================
    LOCK SCREEN SECTION
    Full-screen overlay displayed before site launch date

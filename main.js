@@ -9,7 +9,7 @@ function getWIBDate() {
 }
 
 function openWebsite() {
-  document.body.classList.remove('locked');
+  document.documentElement.classList.remove('locked'); 
   const lockScreen = document.getElementById("lockScreen");
   const mainContent = document.getElementById("mainContent");
   if(lockScreen) lockScreen.style.display = "none";
@@ -17,12 +17,19 @@ function openWebsite() {
 }
 
 function showLockScreen() {
-  document.body.classList.add('locked');
+  document.documentElement.classList.add('locked');
   const lockScreen = document.getElementById("lockScreen");
   const mainContent = document.getElementById("mainContent");
   if(lockScreen) lockScreen.style.display = "flex";
   if(mainContent) mainContent.style.display = "none";
 }
+
+/* TANDAI REFRESH HANYA KALAU BUKAN BARU LOGIN */
+window.addEventListener('pagehide', function() {
+  if (!sessionStorage.getItem('justLoggedIn')) {
+    sessionStorage.setItem('isReloading', 'true');
+  }
+});
 
 /* ============================================
    MAIN APPLICATION LOGIC
@@ -51,6 +58,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
+     INITIAL LOAD CHECK - ANTI KEDIP + ANTI REFRESH KODE 3
+  ============================================ */
+  function handlePageState() {
+    const isReloading = sessionStorage.getItem('isReloading');
+    sessionStorage.removeItem('isReloading');
+    sessionStorage.removeItem('justLoggedIn');
+    
+    let isPermanent = localStorage.getItem("accessType") === "permanent";
+    let isBurn = sessionStorage.getItem("accessType") === "burn";
+    let isTemp = sessionStorage.getItem("accessType") === "temp";
+
+    // KUNCI: KALAU KODE 3 DAN INI REFRESH, HAPUS
+    if (isTemp && isReloading) {
+      sessionStorage.removeItem("accessType");
+      isTemp = false;
+    }
+
+    if (isPermanent || isBurn || isTemp || new Date() >= OPEN_DATE_WIB) {
+      openWebsite(); // langsung buka, ga kedip
+    } else {
+      showLockScreen(); // langsung login, ga kedip
+    }
+  }
+  
+  handlePageState(); 
+  
+  /* ============================================
      COUNTDOWN TIMER
   ============================================ */
   function updateTimer() {
@@ -60,6 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (diff <= 0) {
       openWebsite();
       clearInterval(timerInterval);
+      const timerEl = document.getElementById("timer");
+      if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
       return;
     }
     
@@ -97,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   /* ============================================
-     ACCESS CODE VALIDATION
+     ACCESS CODE VALIDATION - SUDAH DI FIX
   ============================================ */
   async function checkCode() {
     if(!accessCode) return;
@@ -110,18 +146,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const inputHash = await hashCode(kodeInput);
     const burnedCodeInStorage = localStorage.getItem("burnedCode");
-    const isBurned = burnedCodeInStorage === CODE2_BURN;
+    
+    // FIX PENTING: harus bener2 sama dengan hash nya baru hangus
+    const isBurned = burnedCodeInStorage !== null && burnedCodeInStorage === CODE2_BURN;
+
+    sessionStorage.setItem('justLoggedIn', 'true'); // TANDAI BARU LOGIN
 
     // TYPE 1: PERMANENT CODE
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("accessType", "permanent");
+      sessionStorage.removeItem("accessType"); 
       openWebsite();
       return;
     }
 
     // TYPE 2: ONE-TIME BURN CODE
     if (inputHash === CODE2_BURN) {
-      if (isBurned) {
+      if (isBurned) { 
+        sessionStorage.removeItem('justLoggedIn');
         if(errorMsg){ 
           errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
           errorMsg.classList.add("show"); 
@@ -131,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN);
+        localStorage.setItem("burnedCode", CODE2_BURN); // baru diset hangus disini
         sessionStorage.setItem("accessType", "burn");
         openWebsite();
         return;
@@ -146,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // INVALID CODE
+    sessionStorage.removeItem('justLoggedIn');
     if(errorMsg){
       errorMsg.innerText = `"${kodeInput}" kode akses salah`;
       errorMsg.classList.add("show");
@@ -157,22 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   if(submitBtn) submitBtn.addEventListener('click', checkCode);
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
-  
-  /* ============================================
-     INITIAL LOAD CHECK
-  ============================================ */
-  const accessTypeLocal = localStorage.getItem("accessType");
-  const accessTypeSession = sessionStorage.getItem("accessType");
-  
-  if (accessTypeLocal === "permanent" || new Date() >= OPEN_DATE_WIB) {
-    body.classList.remove('locked');
-    openWebsite();
-  } else if (accessTypeSession === "burn" || accessTypeSession === "temp") {
-    body.classList.remove('locked');
-    openWebsite();
-  } else {
-    showLockScreen();
-  }
   
   /* ============================================
      THEME TOGGLE FUNCTIONALITY

@@ -23,6 +23,16 @@
        FAVICON & PAGE TITLE
   ============================================ -->
   <link rel="shortcut icon" href="./Image/favicon.png" type="image/x-icon" />
+  
+  <!-- ANTI KEDIP SCRIPT -->
+<script>
+  (function() {
+    const p = localStorage.getItem("accessType") === "permanent";
+    const b = sessionStorage.getItem("accessType") === "burn";
+    const t = sessionStorage.getItem("accessType") === "temp";
+    document.documentElement.classList[p||b||t ? 'remove' : 'add']('locked');
+  })();
+</script>
   <title>ArilCode — Koleksi PDF Kelompok</title>
 </head>
 
