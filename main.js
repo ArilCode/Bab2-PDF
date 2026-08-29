@@ -42,22 +42,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - VERSI KHUS GITHUB PAGES
+     INITIAL LOAD CHECK - VERSI FINAL GITHUB PAGES
   ============================================ */
   function handlePageState() {
-    // 1. CEK KODE 3 DULU. SELF DESTRUCT
-    if (sessionStorage.getItem("tempAccessActive") === "true") {
-      sessionStorage.removeItem("tempAccessActive");
-      showLockScreen();
-      return;
-    }
-
-    // 2. CEK TANGGAL BUKA
+    // 1. CEK TANGGAL BUKA DULU. PALING TINGGI
     if (new Date() >= OPEN_DATE_WIB) {
       openWebsite();
       return;
     }
-    
+
+    // 2. CEK KODE 3 DULU. SELF DESTRUCT 1X F5
+    if (sessionStorage.getItem("tempAccessActive") === "true") {
+      showLockScreen(); // Langsung kunci dulu
+      sessionStorage.removeItem("tempAccessActive"); // Baru hapus flag
+      return;
+    }
+
     // 3. CEK JEJAK LOGIN DI LOCALSTORAGE
     const accessGranted = localStorage.getItem("accessGranted");
     const burnedCode = localStorage.getItem("burnedCode");
@@ -132,14 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const burnedCode = localStorage.getItem("burnedCode");
     const isBurned = burnedCode !== null && burnedCode === CODE2_BURN;
 
-    // TYPE 1: PERMANENT CODE
+    // TYPE 1: PERMANEN
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("accessGranted", "permanent");
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE
+    // TYPE 2: 1X PAKAI HANGUS
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
         if(errorMsg){ 
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE - 1X REFRESH MATI
+    // TYPE 3: 1X PAKAI REFRESH MATI
     if (inputHash === CODE3_RESET) {
       sessionStorage.setItem("tempAccessActive", "true");
       openWebsite();
