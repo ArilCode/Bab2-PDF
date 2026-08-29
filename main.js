@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
-  // HASH SHA256 DARI KODE
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
@@ -42,65 +41,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     NAVIGATION: handle special "reload" undo for burn-code
-  ============================================ */
-  try {
-    const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
-    const navType = (navEntries && navEntries[0] && navEntries[0].type) || (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
-    const myBurnSession = sessionStorage.getItem('burnSessionId');
-    // If this load is a reload and this tab previously set the burned marker during its unload,
-    // undo the burned marker so refresh keeps the session alive.
-    if (navType === 'reload' && myBurnSession && localStorage.getItem('burnedBySession') === myBurnSession) {
-      localStorage.removeItem('burnedCode');
-      localStorage.removeItem('burnedBySession');
-    }
-  } catch (e) {
-    // ignore - best-effort
-  }
-
-  /* ============================================
-     INITIAL LOAD CHECK - VERSI FINAL KODE 2 = 1 SESI
+     INITIAL LOAD CHECK - VERSI FINAL ANTI HOSTING
   ============================================ */
   function handlePageState() {
-    // 1. TANGGAL BUKA - gunakan WIB konsisten
-    if (getWIBDate() >= OPEN_DATE_WIB) {
+    // 1. TANGGAL BUKA PALING TINGGI
+    if (new Date() >= OPEN_DATE_WIB) {
       openWebsite();
       return;
     }
 
-    // 2. CEK KODE 1 - PERMANEN PAKE LOCALSTORAGE (prioritas lebih tinggi)
-    if (localStorage.getItem("accessGranted") === "permanent") {
+    const loginType = localStorage.getItem("loginType");
+    const burnUsed = localStorage.getItem("burnUsed") === "1";
+
+    // 2. CEK KODE 1 - PERMANEN
+    if (loginType === "perm") {
       openWebsite(); 
       return;
     }
 
-    // 3. CEK KODE 2 - 1 SESI PAKE SESSIONSTORAGE
-    const isBurnSessionActive = sessionStorage.getItem("accessType") === "burn";
-    const isBurned = localStorage.getItem("burnedCode") === CODE2_BURN;
-
-    if (isBurnSessionActive && !isBurned) {
-      openWebsite(); // Masih dalam 1 sesi dan belum hangus
-      return;
-    }
-    // 4. KALAU ADA JEJAK HANGUS TAPI SESSION MATI = TENDANG
-    if(isBurned){
-      showLockScreen();
+    // 3. CEK KODE 2 - 1 SESI
+    if (loginType === "burn") {
+      if(burnUsed){ // Udah dipake dan nutup tab
+        showLockScreen();
+      } else { // Masih dalam sesi
+        openWebsite();
+      }
       return;
     }
 
-    // 5. CEK KODE 3 - 1X REFRESH LANGSUNG LOGOUT
-    if (sessionStorage.getItem("tempAccessActive") === "true") {
+    // 4. CEK KODE 3 - 1X REFRESH
+    if (loginType === "temp") {
+      localStorage.removeItem("loginType"); // Langsung hapus biar 1x F5
       showLockScreen(); 
-      sessionStorage.removeItem("tempAccessActive"); 
       return;
     }
 
-    // 6. DEFAULT
+    // 5. DEFAULT: BELUM LOGIN
     showLockScreen(); 
   }
   
   handlePageState(); 
   
+  /* HAPUS LOGIN SESI PAS TUTUP TAB - KHUSUS KODE 2 */
+  window.addEventListener('beforeunload', () => {
+    if(localStorage.getItem("loginType") === "burn"){
+      localStorage.removeItem("loginType"); // Hapus status login, tapi jejak hangus tetap ada
+    }
+  });
+
   /* ============================================
      COUNTDOWN TIMER
   ============================================ */
@@ -157,18 +145,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const inputHash = await hashCode(kodeInput);
-    const isBurned = localStorage.getItem("burnedCode") === CODE2_BURN;
+    const burnUsed = localStorage.getItem("burnUsed") === "1";
 
     // TYPE 1: PERMANEN
     if (inputHash === CODE1_PERMANENT) {
-      localStorage.setItem("accessGranted", "permanent");
+      localStorage.setItem("loginType", "perm");
       openWebsite();
       return;
     }
 
     // TYPE 2: 1 SESI
     if (inputHash === CODE2_BURN) {
-      if (isBurned) { 
+      if (burnUsed) { 
         if(errorMsg){ 
           errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
           errorMsg.classList.add("show"); 
@@ -178,11 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        // Jangan langsung tandai hangus: gunakan sessionStorage untuk 1-sesi login.
-        const burnSessionId = 'burn_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        sessionStorage.setItem("burnSessionId", burnSessionId);
-        sessionStorage.setItem("accessType", "burn"); // Kasih izin "sedang login"
-        // Jangan set localStorage.burnedCode sekarang — hanya set saat tab ditutup.
+        localStorage.setItem("loginType", "burn"); // Status login
+        localStorage.setItem("burnUsed", "1"); // Jejak hangus permanen
         openWebsite();
         return;
       }
@@ -190,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // TYPE 3: 1X REFRESH
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("tempAccessActive", "true");
+      localStorage.setItem("loginType", "temp");
       openWebsite();
       return;
     }
@@ -209,28 +194,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
   /* ============================================
-     HANDLE TAB CLOSE / UNLOAD FOR KODE 2 (burn-on-close)
-     - On unload, if this session had accessType=burn, set burned marker in localStorage
-     - On reload, the startup code will undo the burn only if it was set by THIS session
-  ============================================ */
-  window.addEventListener('unload', () => {
-    try {
-      const accessType = sessionStorage.getItem('accessType');
-      const burnSessionId = sessionStorage.getItem('burnSessionId');
-      if (accessType === 'burn' && burnSessionId) {
-        localStorage.setItem('burnedCode', CODE2_BURN);
-        localStorage.setItem('burnedBySession', burnSessionId);
-      }
-    } catch (e) { /* best-effort */ }
-  });
-
-  /* ============================================
      THEME TOGGLE
   ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
   const icons = {
-    light: `<svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="12" cy="12" r="4" fill="#FFC107"/><g stroke="#FFC107" stroke-width="1.8" stroke-linecap[...]`
+    light: `<svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="12" cy="12" r="4" fill="#FFC107"/><g stroke="#FFC107" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"/><path d="M5.5 5.5l1.77 1.77M16.73 16.73l1.77 1.77M5.5 18.5l1.77-1.77M16.73 7.27l1.77-1.77"/></g></svg>`,
     dark: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#90CAF9"/></svg>`
   };
   function applyTheme(theme) {
