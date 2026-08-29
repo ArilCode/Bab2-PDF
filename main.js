@@ -1,6 +1,5 @@
 /* ============================================
    UTILITY FUNCTIONS
-   Helper functions for time and website access
 ============================================ */
 function getWIBDate() {
   const now = new Date();
@@ -24,34 +23,18 @@ function showLockScreen() {
   if(mainContent) mainContent.style.display = "none";
 }
 
-/* FIX KODE 3: HAPUS LANGSUNG PAS REFRESH KALAU BUKAN HABIS LOGIN */
-window.addEventListener('beforeunload', function() {
-  const isFirstLoad = sessionStorage.getItem('isFirstLoadAfterLogin');
-  if (!isFirstLoad && sessionStorage.getItem("accessType") === "temp") {
-    sessionStorage.removeItem("accessType"); // langsung hapus kode 3 pas refresh
-  }
-});
-
 /* ============================================
    MAIN APPLICATION LOGIC
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   
-  /* ============================================
-     ACCESS CODE CONFIGURATION - HASHED
-  ============================================ */
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
-  // Kode 1: Permanent - ARIL2026
-  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
-  
-  // Kode 2: Burn 1x - GURU2026. Tahan F5, mati kalau tutup tab
-  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
-  
-  // Kode 3: Reset tiap reload - ADMIN2026
-  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
+  // HASH SHA256 DARI KODE
+  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
+  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
+  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
 
-  /* DOM Element References */
   const accessCode = document.getElementById("accessCode");
   const errorMsg = document.getElementById("errorMsg");
   const togglePassword = document.getElementById('togglePassword');
@@ -59,20 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - ANTI KEDIP V2
+     INITIAL LOAD CHECK - VERSI KHUS GITHUB PAGES
   ============================================ */
   function handlePageState() {
-    // hapus flag setelah 1x dicek. Artinya load selanjutnya = refresh
-    sessionStorage.removeItem('isFirstLoadAfterLogin');
-    
-    let isPermanent = localStorage.getItem("accessType") === "permanent";
-    let isBurn = sessionStorage.getItem("accessType") === "burn";
-    let isTemp = sessionStorage.getItem("accessType") === "temp";
+    // 1. CEK KODE 3 DULU. SELF DESTRUCT
+    if (sessionStorage.getItem("tempAccessActive") === "true") {
+      sessionStorage.removeItem("tempAccessActive");
+      showLockScreen();
+      return;
+    }
 
-    if (isPermanent || isBurn || isTemp || new Date() >= OPEN_DATE_WIB) {
-      openWebsite(); // langsung buka, ga kedip
+    // 2. CEK TANGGAL BUKA
+    if (new Date() >= OPEN_DATE_WIB) {
+      openWebsite();
+      return;
+    }
+    
+    // 3. CEK JEJAK LOGIN DI LOCALSTORAGE
+    const accessGranted = localStorage.getItem("accessGranted");
+    const burnedCode = localStorage.getItem("burnedCode");
+
+    if (accessGranted === "permanent") {
+      openWebsite(); // Kode 1
+    } else if (accessGranted === "burn" && burnedCode === CODE2_BURN) {
+      openWebsite(); // Kode 2 yang belum hangus
     } else {
-      showLockScreen(); // langsung login, ga kedip
+      showLockScreen(); 
     }
   }
   
@@ -84,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateTimer() {
     const now = getWIBDate();
     const diff = OPEN_DATE_WIB - now;
-    
     if (diff <= 0) {
       openWebsite();
       clearInterval(timerInterval);
@@ -92,16 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
       return;
     }
-    
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    
     const timerEl = document.getElementById("timer");
     if(timerEl) timerEl.innerHTML = `<span>${d}H</span> <span>${h}J</span> <span>${m}M</span> <span>${s}D</span>`;
   }
-  
   const timerInterval = setInterval(updateTimer, 1000);
   updateTimer();
   
@@ -132,26 +123,23 @@ document.addEventListener("DOMContentLoaded", () => {
   async function checkCode() {
     if(!accessCode) return;
     const kodeInput = accessCode.value.trim();
-    
     if(kodeInput === "") {
       if(errorMsg){ errorMsg.innerText = "Kode tidak boleh kosong!"; errorMsg.classList.add("show"); setTimeout(() => errorMsg.classList.remove("show"), 2500); }
       return;
     }
 
     const inputHash = await hashCode(kodeInput);
-    const burnedCodeInStorage = localStorage.getItem("burnedCode");
-    const isBurned = burnedCodeInStorage !== null && burnedCodeInStorage === CODE2_BURN;
+    const burnedCode = localStorage.getItem("burnedCode");
+    const isBurned = burnedCode !== null && burnedCode === CODE2_BURN;
 
-    // TYPE 1: PERMANENT CODE - TIDAK DIUBAH
+    // TYPE 1: PERMANENT CODE
     if (inputHash === CODE1_PERMANENT) {
-      localStorage.setItem("accessType", "permanent");
-      sessionStorage.removeItem("accessType"); 
-      sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
+      localStorage.setItem("accessGranted", "permanent");
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE - TIDAK DIUBAH
+    // TYPE 2: ONE-TIME BURN CODE
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
         if(errorMsg){ 
@@ -164,17 +152,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return; 
       } else {
         localStorage.setItem("burnedCode", CODE2_BURN);
-        sessionStorage.setItem("accessType", "burn");
-        sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
+        localStorage.setItem("accessGranted", "burn");
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE - SUDAH DI FIX
+    // TYPE 3: ONE-TIME RESET CODE - 1X REFRESH MATI
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("accessType", "temp");
-      sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
+      sessionStorage.setItem("tempAccessActive", "true");
       openWebsite();
       return;
     }
@@ -193,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
   /* ============================================
-     THEME TOGGLE FUNCTIONALITY
+     THEME TOGGLE
   ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
@@ -229,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
 
   /* ============================================
-     NAVIGATION & ABOUT SECTION HIGHLIGHT
+     NAVIGATION & ABOUT & POPUP & PDF
   ============================================ */
   const navLinks = document.querySelectorAll('.nav-links a');
   const aboutSection = document.querySelector('.about');
@@ -256,9 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if(aboutSection) aboutSection.addEventListener('click', (e) => { e.stopPropagation(); resetAll(); });
 
-  /* ============================================
-     POPUP MODAL SYSTEM
-  ============================================ */
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popup-text');
   const popupClose = document.querySelector('.popup-close');
@@ -268,9 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if(popup) popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
-  /* ============================================
-     PDF DOWNLOAD VALIDATION
-  ============================================ */
   const downloadBtns = document.querySelectorAll('.btn-outline[href$=".pdf"]');
   downloadBtns.forEach(btn => {
     btn.addEventListener('click', async (e) => {
