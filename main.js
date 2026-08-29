@@ -40,64 +40,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitBtn = document.getElementById('submitBtn');
   const body = document.body;
   
-  /* ============================================
-     INITIAL LOAD CHECK - FIX F5 VS TUTUP TAB
-  ============================================ */
   function handlePageState() {
-    // 1. TANGGAL BUKA PALING TINGGI
-    if (new Date() >= OPEN_DATE_WIB) {
-      openWebsite();
-      return;
-    }
-
+    if (new Date() >= OPEN_DATE_WIB) { openWebsite(); return; }
     const loginType = localStorage.getItem("loginType");
     const burnUsed = localStorage.getItem("burnUsed") === "1";
-    const sessionFlag = sessionStorage.getItem("sessionActive"); // PENGAWAS
+    const sessionFlag = sessionStorage.getItem("sessionActive");
 
-    // 2. CEK KODE 1 - PERMANEN
-    if (loginType === "perm") {
-      openWebsite(); 
-      return;
-    }
+    if (loginType === "perm") { openWebsite(); return; }
 
-    // 3. CEK KODE 2 - 1 SESI
     if (loginType === "burn") {
-      if(burnUsed && !sessionFlag){ // Udah dipake DAN ini buka tab baru
-        localStorage.removeItem("loginType"); // Bersihin biar rapi
-        showLockScreen();
-      } else if (!burnUsed) { // Masih dalam sesi pertama
-        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda "masih hidup"
-        openWebsite();
-      } else { // burnUsed=true tapi sessionFlag ada = F5
-        sessionStorage.setItem("sessionActive", "1"); // Perbarui
+      if(burnUsed){ 
+        if(!sessionFlag){ 
+          localStorage.removeItem("loginType"); 
+          showLockScreen();
+        } else { 
+          openWebsite(); 
+        }
+      } else { 
+        sessionStorage.setItem("sessionActive", "1"); 
         openWebsite();
       }
       return;
     }
 
-    // 4. CEK KODE 3 - 1X REFRESH
     if (loginType === "temp") {
-      localStorage.removeItem("loginType"); // Langsung hapus biar 1x F5
+      localStorage.removeItem("loginType"); 
       showLockScreen(); 
       return;
     }
-
-    // 5. DEFAULT: BELUM LOGIN
     showLockScreen(); 
   }
   
   handlePageState(); 
-  
-  /* HAPUS PENANDA SESI PAS TUTUP TAB/BROWSER - KHUSUS KODE 2 */
-  window.addEventListener('beforeunload', () => {
-    if(localStorage.getItem("loginType") === "burn"){
-      sessionStorage.removeItem("sessionActive"); // Hapus penanda sesi
-    }
-  });
 
-  /* ============================================
-     COUNTDOWN TIMER
-  ============================================ */
   function updateTimer() {
     const now = getWIBDate();
     const diff = OPEN_DATE_WIB - now;
@@ -118,9 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const timerInterval = setInterval(updateTimer, 1000);
   updateTimer();
   
-  /* ============================================
-     PASSWORD VISIBILITY TOGGLE
-  ============================================ */
   if(togglePassword && accessCode) {
     togglePassword.addEventListener('click', function() {
       const type = accessCode.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -130,18 +102,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  /* ============================================
-     HASHING FUNCTION - SHA256
-  ============================================ */
   async function hashCode(code) {
     const msgBuffer = new TextEncoder().encode(code);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
   
-  /* ============================================
-     ACCESS CODE VALIDATION
-  ============================================ */
   async function checkCode() {
     if(!accessCode) return;
     const kodeInput = accessCode.value.trim();
@@ -149,18 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if(errorMsg){ errorMsg.innerText = "Kode tidak boleh kosong!"; errorMsg.classList.add("show"); setTimeout(() => errorMsg.classList.remove("show"), 2500); }
       return;
     }
-
     const inputHash = await hashCode(kodeInput);
     const burnUsed = localStorage.getItem("burnUsed") === "1";
 
-    // TYPE 1: PERMANEN
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("loginType", "perm");
       openWebsite();
       return;
     }
 
-    // TYPE 2: 1 SESI
     if (inputHash === CODE2_BURN) {
       if (burnUsed) { 
         if(errorMsg){ 
@@ -172,22 +135,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("loginType", "burn"); // Status login
-        localStorage.setItem("burnUsed", "1"); // Jejak hangus permanen
-        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda sesi mulai
+        localStorage.setItem("loginType", "burn");
+        localStorage.setItem("burnUsed", "1");
+        sessionStorage.setItem("sessionActive", "1");
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: 1X REFRESH
     if (inputHash === CODE3_RESET) {
       localStorage.setItem("loginType", "temp");
       openWebsite();
       return;
     }
 
-    // INVALID CODE
     if(errorMsg){
       errorMsg.innerText = `"${kodeInput}" kode akses salah`;
       errorMsg.classList.add("show");
@@ -200,9 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if(submitBtn) submitBtn.addEventListener('click', checkCode);
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
-  /* ============================================
-     THEME TOGGLE
-  ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
   const icons = {
@@ -236,9 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initTheme();
 
-  /* ============================================
-     NAVIGATION & ABOUT & POPUP & PDF
-  ============================================ */
   const navLinks = document.querySelectorAll('.nav-links a');
   const aboutSection = document.querySelector('.about');
   const btnTentang = document.querySelector('.nav-links a[href="#about"]');
