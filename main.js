@@ -1,5 +1,6 @@
 /* ============================================
    UTILITY FUNCTIONS
+   Helper functions for time and website access
 ============================================ */
 function getWIBDate() {
   const now = new Date();
@@ -8,7 +9,7 @@ function getWIBDate() {
 }
 
 function openWebsite() {
-  document.documentElement.classList.remove('locked');
+  document.documentElement.classList.remove('locked'); 
   const lockScreen = document.getElementById("lockScreen");
   const mainContent = document.getElementById("mainContent");
   if(lockScreen) lockScreen.style.display = "none";
@@ -23,85 +24,67 @@ function showLockScreen() {
   if(mainContent) mainContent.style.display = "none";
 }
 
-/* COOKIE HELPER */
-function setCookie(name, value, days) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
+/* FIX KODE 3: HAPUS LANGSUNG PAS REFRESH KALAU BUKAN HABIS LOGIN */
+window.addEventListener('beforeunload', function() {
+  const isFirstLoad = sessionStorage.getItem('isFirstLoadAfterLogin');
+  if (!isFirstLoad && sessionStorage.getItem("accessType") === "temp") {
+    sessionStorage.removeItem("accessType"); // langsung hapus kode 3 pas refresh
   }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/";
-}
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i=0;i < ca.length;i++) {
-    let c = ca[i];
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-  }
-  return null;
-}
-function eraseCookie(name) {
-  document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-}
+});
 
 /* ============================================
    MAIN APPLICATION LOGIC
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-
+  
+  /* ============================================
+     ACCESS CODE CONFIGURATION - HASHED
+  ============================================ */
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
+  
+  // Kode 1: Permanent - ARIL2026
+  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
+  
+  // Kode 2: Burn 1x - GURU2026. Tahan F5, mati kalau tutup tab
+  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
+  
+  // Kode 3: Reset tiap reload - ADMIN2026
+  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
 
-  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
-  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
-  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
-
+  /* DOM Element References */
   const accessCode = document.getElementById("accessCode");
   const errorMsg = document.getElementById("errorMsg");
   const togglePassword = document.getElementById('togglePassword');
   const submitBtn = document.getElementById('submitBtn');
   const body = document.body;
-
+  
   /* ============================================
-     INITIAL LOAD CHECK - PAKE COOKIE
+     INITIAL LOAD CHECK - ANTI KEDIP V2
   ============================================ */
   function handlePageState() {
-    let isPermanent = getCookie("accessType") === "permanent";
+    // hapus flag setelah 1x dicek. Artinya load selanjutnya = refresh
+    sessionStorage.removeItem('isFirstLoadAfterLogin');
+    
+    let isPermanent = localStorage.getItem("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
-    let isTempActive = sessionStorage.getItem("tempAccessActive") === "true";
-    let burnedCodeInCookie = getCookie("burnedCode");
+    let isTemp = sessionStorage.getItem("accessType") === "temp";
 
-    // KUNCI 1: KODE 3 SELF DESTRUCT
-    if (isTempActive) {
-      sessionStorage.removeItem("tempAccessActive");
-      sessionStorage.removeItem("accessType");
-      showLockScreen();
-      return;
-    }
-
-    // KUNCI 2: KODE 2 CEK DARI COOKIE
-    if (burnedCodeInCookie === CODE2_BURN &&!isBurn) {
-      showLockScreen();
-      return;
-    }
-
-    if (isPermanent || isBurn || new Date() >= OPEN_DATE_WIB) {
-      openWebsite();
+    if (isPermanent || isBurn || isTemp || new Date() >= OPEN_DATE_WIB) {
+      openWebsite(); // langsung buka, ga kedip
     } else {
-      showLockScreen();
+      showLockScreen(); // langsung login, ga kedip
     }
   }
-
-  handlePageState();
-
+  
+  handlePageState(); 
+  
   /* ============================================
      COUNTDOWN TIMER
   ============================================ */
   function updateTimer() {
     const now = getWIBDate();
     const diff = OPEN_DATE_WIB - now;
+    
     if (diff <= 0) {
       openWebsite();
       clearInterval(timerInterval);
@@ -109,28 +92,31 @@ document.addEventListener("DOMContentLoaded", () => {
       if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
       return;
     }
+    
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
+    
     const timerEl = document.getElementById("timer");
     if(timerEl) timerEl.innerHTML = `<span>${d}H</span> <span>${h}J</span> <span>${m}M</span> <span>${s}D</span>`;
   }
+  
   const timerInterval = setInterval(updateTimer, 1000);
   updateTimer();
-
+  
   /* ============================================
      PASSWORD VISIBILITY TOGGLE
   ============================================ */
   if(togglePassword && accessCode) {
     togglePassword.addEventListener('click', function() {
-      const type = accessCode.getAttribute('type') === 'password'? 'text' : 'password';
+      const type = accessCode.getAttribute('type') === 'password' ? 'text' : 'password';
       accessCode.setAttribute('type', type);
       this.classList.toggle('fa-eye');
       this.classList.toggle('fa-eye-slash');
     });
   }
-
+  
   /* ============================================
      HASHING FUNCTION - SHA256
   ============================================ */
@@ -139,55 +125,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
-
+  
   /* ============================================
      ACCESS CODE VALIDATION
   ============================================ */
   async function checkCode() {
     if(!accessCode) return;
     const kodeInput = accessCode.value.trim();
+    
     if(kodeInput === "") {
       if(errorMsg){ errorMsg.innerText = "Kode tidak boleh kosong!"; errorMsg.classList.add("show"); setTimeout(() => errorMsg.classList.remove("show"), 2500); }
       return;
     }
 
     const inputHash = await hashCode(kodeInput);
-    const burnedCodeInCookie = getCookie("burnedCode");
-    const isBurned = burnedCodeInCookie!== null && burnedCodeInCookie === CODE2_BURN;
+    const burnedCodeInStorage = localStorage.getItem("burnedCode");
+    const isBurned = burnedCodeInStorage !== null && burnedCodeInStorage === CODE2_BURN;
 
-    // TYPE 1: PERMANENT CODE - SIMPAN DI COOKIE 365 HARI
+    // TYPE 1: PERMANENT CODE - TIDAK DIUBAH
     if (inputHash === CODE1_PERMANENT) {
-      setCookie("accessType", "permanent", 365);
-      sessionStorage.removeItem("accessType");
-      sessionStorage.removeItem("tempAccessActive");
+      localStorage.setItem("accessType", "permanent");
+      sessionStorage.removeItem("accessType"); 
+      sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE - SIMPAN DI COOKIE
+    // TYPE 2: ONE-TIME BURN CODE - TIDAK DIUBAH
     if (inputHash === CODE2_BURN) {
-      if (isBurned) {
-        if(errorMsg){
-          errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!";
-          errorMsg.classList.add("show");
-          accessCode.value = "";
+      if (isBurned) { 
+        if(errorMsg){ 
+          errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
+          errorMsg.classList.add("show"); 
+          accessCode.value = ""; 
           accessCode.focus();
-          setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500);
+          setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500); 
         }
-        return;
+        return; 
       } else {
-        setCookie("burnedCode", CODE2_BURN, 365); // KUNCI: PAKE COOKIE
+        localStorage.setItem("burnedCode", CODE2_BURN);
         sessionStorage.setItem("accessType", "burn");
-        sessionStorage.removeItem("tempAccessActive");
+        sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
         openWebsite();
         return;
       }
     }
-
-    // TYPE 3: ONE-TIME RESET CODE - TETAP PAKE SESSION
+    
+    // TYPE 3: ONE-TIME RESET CODE - SUDAH DI FIX
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("tempAccessActive", "true");
       sessionStorage.setItem("accessType", "temp");
+      sessionStorage.setItem('isFirstLoadAfterLogin', 'true'); // KASIH TANDA
       openWebsite();
       return;
     }
@@ -201,12 +188,12 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500);
     }
   }
-
+  
   if(submitBtn) submitBtn.addEventListener('click', checkCode);
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
-
+  
   /* ============================================
-     THEME TOGGLE
+     THEME TOGGLE FUNCTIONALITY
   ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
@@ -215,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dark: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#90CAF9"/></svg>`
   };
   function applyTheme(theme) {
-    if (!root ||!toggleBtn) return;
+    if (!root || !toggleBtn) return;
     if (theme === 'light') {
       root.setAttribute('data-theme', 'light');
       toggleBtn.innerHTML = icons.dark;
@@ -233,8 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if(toggleBtn){
     toggleBtn.addEventListener('click', () => {
-      const current = root.getAttribute('data-theme') === 'light'? 'light' : 'dark';
-      const next = current === 'dark'? 'light' : 'dark';
+      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
       applyTheme(next);
       localStorage.setItem('site-theme', next);
     });
@@ -242,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
 
   /* ============================================
-     NAVIGATION & ABOUT & POPUP & PDF
+     NAVIGATION & ABOUT SECTION HIGHLIGHT
   ============================================ */
   const navLinks = document.querySelectorAll('.nav-links a');
   const aboutSection = document.querySelector('.about');
@@ -265,10 +252,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   document.addEventListener('click', (e) => {
-    if (aboutSection &&!aboutSection.contains(e.target) && btnTentang &&!btnTentang.contains(e.target)) resetAll();
+    if (aboutSection && !aboutSection.contains(e.target) && btnTentang && !btnTentang.contains(e.target)) resetAll();
   });
   if(aboutSection) aboutSection.addEventListener('click', (e) => { e.stopPropagation(); resetAll(); });
 
+  /* ============================================
+     POPUP MODAL SYSTEM
+  ============================================ */
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popup-text');
   const popupClose = document.querySelector('.popup-close');
@@ -278,13 +268,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if(popup) popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
+  /* ============================================
+     PDF DOWNLOAD VALIDATION
+  ============================================ */
   const downloadBtns = document.querySelectorAll('.btn-outline[href$=".pdf"]');
   downloadBtns.forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const url = btn.getAttribute('href');
-      try {
-        const res = await fetch(url, { method: 'GET' });
-        if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); }
+      try { 
+        const res = await fetch(url, { method: 'GET' }); 
+        if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); } 
       }
       catch (err) { e.preventDefault(); showPopup('File belum bisa di akses'); }
     });
