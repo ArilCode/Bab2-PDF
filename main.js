@@ -30,12 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
-  // Kode 1: Permanent - ARIL2026
-  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
-  // Kode 2: Burn 1x - GURU2026
-  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
-  // Kode 3: Reset tiap reload - ADMIN2026
-  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
+  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
+  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
+  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
 
   const accessCode = document.getElementById("accessCode");
   const errorMsg = document.getElementById("errorMsg");
@@ -44,18 +41,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - BRUTAL MODE UNTUK KODE 3
+     INITIAL LOAD CHECK - VERSI FINAL ANTI BUG
   ============================================ */
   function handlePageState() {
     let isPermanent = localStorage.getItem("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
-    let isTemp = sessionStorage.getItem("accessType") === "temp";
+    
+    // KUNCI BARU: CEK FLAG KHUS UNTUK KODE 3
+    let isTempActive = sessionStorage.getItem("tempAccessActive") === "true";
 
-    // BRUTAL: KALAU KETEMU TEMP LANGSUNG HAPUS DAN KICK
-    if (isTemp) {
-      sessionStorage.removeItem("accessType");
+    // KALAU KETEMU FLAG KODE 3, LANGSUNG HAPUS DAN KICK
+    if (isTempActive) {
+      sessionStorage.removeItem("tempAccessActive"); // self destruct
+      sessionStorage.removeItem("accessType"); // jaga2
       showLockScreen();
-      return; // STOP DISINI
+      return;
     }
 
     if (isPermanent || isBurn || new Date() >= OPEN_DATE_WIB) {
@@ -130,11 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("accessType", "permanent");
       sessionStorage.removeItem("accessType"); 
+      sessionStorage.removeItem("tempAccessActive"); // bersihkan
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE
+    // TYPE 2: ONE-TIME BURN CODE - TIDAK DIOTAK ATIK
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
         if(errorMsg){ 
@@ -148,14 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         localStorage.setItem("burnedCode", CODE2_BURN);
         sessionStorage.setItem("accessType", "burn");
+        sessionStorage.removeItem("tempAccessActive"); // bersihkan
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE - CUMA SET 1 KALI
+    // TYPE 3: ONE-TIME RESET CODE - PAKE FLAG BARU
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("accessType", "temp");
+      sessionStorage.setItem("tempAccessActive", "true"); // FLAG KHUS KODE 3
+      sessionStorage.setItem("accessType", "temp"); // tetap set biar bisa masuk
       openWebsite();
       return;
     }
