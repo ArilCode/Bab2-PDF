@@ -41,19 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - VERSI FINAL ANTI BUG
+     INITIAL LOAD CHECK - FIX KODE 2 ONLINE
   ============================================ */
   function handlePageState() {
     let isPermanent = localStorage.getItem("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
-    
-    // KUNCI BARU: CEK FLAG KHUS UNTUK KODE 3
     let isTempActive = sessionStorage.getItem("tempAccessActive") === "true";
+    let burnedCodeInStorage = localStorage.getItem("burnedCode");
 
-    // KALAU KETEMU FLAG KODE 3, LANGSUNG HAPUS DAN KICK
+    // KUNCI 1: KALAU KETEMU FLAG KODE 3, LANGSUNG HAPUS DAN KICK
     if (isTempActive) {
-      sessionStorage.removeItem("tempAccessActive"); // self destruct
-      sessionStorage.removeItem("accessType"); // jaga2
+      sessionStorage.removeItem("tempAccessActive");
+      sessionStorage.removeItem("accessType");
+      showLockScreen();
+      return;
+    }
+
+    // KUNCI 2: KALAU KODE 2 UDAH DIPAKE TAPI SESSION KEHAPUS, TETAP KICK
+    if (burnedCodeInStorage === CODE2_BURN && !isBurn) {
       showLockScreen();
       return;
     }
@@ -130,12 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("accessType", "permanent");
       sessionStorage.removeItem("accessType"); 
-      sessionStorage.removeItem("tempAccessActive"); // bersihkan
+      sessionStorage.removeItem("tempAccessActive");
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE - TIDAK DIOTAK ATIK
+    // TYPE 2: ONE-TIME BURN CODE - FIX UTAMA DI SINI
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
         if(errorMsg){ 
@@ -147,18 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
+        // KUNCI: SET 2 DUA NYA SEKALIGUS. JADI WALAU SESSION KEHAPUS, LOCALSTORAGE UDAH NGANCI
         localStorage.setItem("burnedCode", CODE2_BURN);
         sessionStorage.setItem("accessType", "burn");
-        sessionStorage.removeItem("tempAccessActive"); // bersihkan
+        sessionStorage.removeItem("tempAccessActive");
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE - PAKE FLAG BARU
+    // TYPE 3: ONE-TIME RESET CODE
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("tempAccessActive", "true"); // FLAG KHUS KODE 3
-      sessionStorage.setItem("accessType", "temp"); // tetap set biar bisa masuk
+      sessionStorage.setItem("tempAccessActive", "true");
+      sessionStorage.setItem("accessType", "temp");
       openWebsite();
       return;
     }
