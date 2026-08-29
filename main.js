@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - VERSI FINAL ANTI HOSTING
+     INITIAL LOAD CHECK - FIX F5 VS TUTUP TAB
   ============================================ */
   function handlePageState() {
     // 1. TANGGAL BUKA PALING TINGGI
@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const loginType = localStorage.getItem("loginType");
     const burnUsed = localStorage.getItem("burnUsed") === "1";
+    const sessionFlag = sessionStorage.getItem("sessionActive"); // PENGAWAS
 
     // 2. CEK KODE 1 - PERMANEN
     if (loginType === "perm") {
@@ -61,9 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. CEK KODE 2 - 1 SESI
     if (loginType === "burn") {
-      if(burnUsed){ // Udah dipake dan nutup tab
+      if(burnUsed && !sessionFlag){ // Udah dipake DAN ini buka tab baru
+        localStorage.removeItem("loginType"); // Bersihin biar rapi
         showLockScreen();
-      } else { // Masih dalam sesi
+      } else if (!burnUsed) { // Masih dalam sesi pertama
+        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda "masih hidup"
+        openWebsite();
+      } else { // burnUsed=true tapi sessionFlag ada = F5
+        sessionStorage.setItem("sessionActive", "1"); // Perbarui
         openWebsite();
       }
       return;
@@ -82,10 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
   handlePageState(); 
   
-  /* HAPUS LOGIN SESI PAS TUTUP TAB - KHUSUS KODE 2 */
+  /* HAPUS PENANDA SESI PAS TUTUP TAB/BROWSER - KHUSUS KODE 2 */
   window.addEventListener('beforeunload', () => {
     if(localStorage.getItem("loginType") === "burn"){
-      localStorage.removeItem("loginType"); // Hapus status login, tapi jejak hangus tetap ada
+      sessionStorage.removeItem("sessionActive"); // Hapus penanda sesi
     }
   });
 
@@ -168,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         localStorage.setItem("loginType", "burn"); // Status login
         localStorage.setItem("burnUsed", "1"); // Jejak hangus permanen
+        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda sesi mulai
         openWebsite();
         return;
       }
