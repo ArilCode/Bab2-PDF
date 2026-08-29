@@ -1,6 +1,5 @@
 /* ============================================
    UTILITY FUNCTIONS
-   Helper functions for time and website access
 ============================================ */
 function getWIBDate() {
   const now = new Date();
@@ -37,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Kode 1: Permanent - ARIL2026
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
   
-  // Kode 2: Burn 1x - GURU2026. Tahan F5, mati kalau tutup tab
+  // Kode 2: Burn 1x + tahan session - GURU2026
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
   
-  // Kode 3: Reset tiap reload - ADMIN2026
+  // Kode 3: Session only - MATI KALAU REFRESH - ADMIN2026
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
 
   /* DOM Element References */
@@ -51,6 +50,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
+     INITIAL LOAD CHECK - ANTI KEDIP + ANTI REFRESH KODE 3
+  ============================================ */
+  function handlePageState() {
+    const isRefresh = performance.navigation && performance.navigation.type === 1; // 1 = reload
+    const accessTypeLocal = localStorage.getItem("accessType"); // permanent
+    let accessTypeSession = sessionStorage.getItem("accessType"); // burn / temp
+    
+    // KUNCI: KALAU KODE 3 DAN INI REFRESH, HAPUS SESSION NYA DULUAN
+    if (accessTypeSession === "temp" && isRefresh) {
+      sessionStorage.removeItem("accessType");
+      accessTypeSession = null;
+    }
+    
+    const isPermanent = accessTypeLocal === "permanent"; // KODE 1
+    const isBurn = accessTypeSession === "burn"; // KODE 2
+    const isTemp = accessTypeSession === "temp"; // KODE 3
+    const isLoggedIn = isPermanent || isBurn || isTemp;
+
+    if (isLoggedIn) {
+      openWebsite(); // ada bukti login = langsung buka tanpa kedip
+    } else {
+      showLockScreen(); // ga ada bukti = tetap kekunci
+    }
+  }
+  
+  handlePageState(); // cek duluan sebelum timer jalan
+  
+  /* ============================================
      COUNTDOWN TIMER
   ============================================ */
   function updateTimer() {
@@ -58,8 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const diff = OPEN_DATE_WIB - now;
     
     if (diff <= 0) {
-      openWebsite();
       clearInterval(timerInterval);
+      const timerEl = document.getElementById("timer");
+      if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
       return;
     }
     
@@ -112,14 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const burnedCodeInStorage = localStorage.getItem("burnedCode");
     const isBurned = burnedCodeInStorage === CODE2_BURN;
 
-    // TYPE 1: PERMANENT CODE
+    // TYPE 1: PERMANENT CODE - simpan di localStorage
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("accessType", "permanent");
+      sessionStorage.removeItem("accessType"); // bersihin session biar ga bentrok
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE
+    // TYPE 2: ONE-TIME BURN CODE - simpan di local "hangus" + session "burn"
     if (inputHash === CODE2_BURN) {
       if (isBurned) {
         if(errorMsg){ 
@@ -131,16 +160,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN);
-        sessionStorage.setItem("accessType", "burn");
+        localStorage.setItem("burnedCode", CODE2_BURN); // tandai sudah dipakai 1x
+        sessionStorage.setItem("accessType", "burn"); // tahan selama tab dibuka / refresh
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE
+    // TYPE 3: SESSION ONLY CODE - mati kalau refresh
     if (inputHash === CODE3_RESET) {
-      sessionStorage.setItem("accessType", "temp");
+      sessionStorage.setItem("accessType", "temp"); // hilang kalau refresh/tutup tab
       openWebsite();
       return;
     }
@@ -157,22 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   if(submitBtn) submitBtn.addEventListener('click', checkCode);
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
-  
-  /* ============================================
-     INITIAL LOAD CHECK
-  ============================================ */
-  const accessTypeLocal = localStorage.getItem("accessType");
-  const accessTypeSession = sessionStorage.getItem("accessType");
-  
-  if (accessTypeLocal === "permanent" || new Date() >= OPEN_DATE_WIB) {
-    body.classList.remove('locked');
-    openWebsite();
-  } else if (accessTypeSession === "burn" || accessTypeSession === "temp") {
-    body.classList.remove('locked');
-    openWebsite();
-  } else {
-    showLockScreen();
-  }
   
   /* ============================================
      THEME TOGGLE FUNCTIONALITY
