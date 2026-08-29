@@ -42,29 +42,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
+     NAVIGATION: handle special "reload" undo for burn-code
+  ============================================ */
+  try {
+    const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+    const navType = (navEntries && navEntries[0] && navEntries[0].type) || (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
+    const myBurnSession = sessionStorage.getItem('burnSessionId');
+    // If this load is a reload and this tab previously set the burned marker during its unload,
+    // undo the burned marker so refresh keeps the session alive.
+    if (navType === 'reload' && myBurnSession && localStorage.getItem('burnedBySession') === myBurnSession) {
+      localStorage.removeItem('burnedCode');
+      localStorage.removeItem('burnedBySession');
+    }
+  } catch (e) {
+    // ignore - best-effort
+  }
+
+  /* ============================================
      INITIAL LOAD CHECK - VERSI FINAL KODE 2 = 1 SESI
   ============================================ */
   function handlePageState() {
-    // 1. TANGGAL BUKA PALING TINGGI
-    if (new Date() >= OPEN_DATE_WIB) {
+    // 1. TANGGAL BUKA - gunakan WIB konsisten
+    if (getWIBDate() >= OPEN_DATE_WIB) {
       openWebsite();
       return;
     }
 
-    // 2. CEK KODE 3 - 1X F5 LANGSUNG MATI
-    if (sessionStorage.getItem("tempAccessActive") === "true") {
-      showLockScreen(); 
-      sessionStorage.removeItem("tempAccessActive"); 
-      return;
-    }
-
-    // 3. CEK KODE 1 - PERMANEN PAKE LOCALSTORAGE
+    // 2. CEK KODE 1 - PERMANEN PAKE LOCALSTORAGE (prioritas lebih tinggi)
     if (localStorage.getItem("accessGranted") === "permanent") {
       openWebsite(); 
       return;
     }
 
-    // 4. CEK KODE 2 - 1 SESI PAKE SESSIONSTORAGE
+    // 3. CEK KODE 2 - 1 SESI PAKE SESSIONSTORAGE
     const isBurnSessionActive = sessionStorage.getItem("accessType") === "burn";
     const isBurned = localStorage.getItem("burnedCode") === CODE2_BURN;
 
@@ -72,10 +82,16 @@ document.addEventListener("DOMContentLoaded", () => {
       openWebsite(); // Masih dalam 1 sesi dan belum hangus
       return;
     }
-    
-    // 5. KALAU ADA JEJAK HANGUS TAPI SESSION MATI = TENDANG
+    // 4. KALAU ADA JEJAK HANGUS TAPI SESSION MATI = TENDANG
     if(isBurned){
       showLockScreen();
+      return;
+    }
+
+    // 5. CEK KODE 3 - 1X REFRESH LANGSUNG LOGOUT
+    if (sessionStorage.getItem("tempAccessActive") === "true") {
+      showLockScreen(); 
+      sessionStorage.removeItem("tempAccessActive"); 
       return;
     }
 
@@ -162,8 +178,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN); // Kasih tanda "udah dipake"
+        // Jangan langsung tandai hangus: gunakan sessionStorage untuk 1-sesi login.
+        const burnSessionId = 'burn_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        sessionStorage.setItem("burnSessionId", burnSessionId);
         sessionStorage.setItem("accessType", "burn"); // Kasih izin "sedang login"
+        // Jangan set localStorage.burnedCode sekarang — hanya set saat tab ditutup.
         openWebsite();
         return;
       }
@@ -190,12 +209,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
   /* ============================================
+     HANDLE TAB CLOSE / UNLOAD FOR KODE 2 (burn-on-close)
+     - On unload, if this session had accessType=burn, set burned marker in localStorage
+     - On reload, the startup code will undo the burn only if it was set by THIS session
+  ============================================ */
+  window.addEventListener('unload', () => {
+    try {
+      const accessType = sessionStorage.getItem('accessType');
+      const burnSessionId = sessionStorage.getItem('burnSessionId');
+      if (accessType === 'burn' && burnSessionId) {
+        localStorage.setItem('burnedCode', CODE2_BURN);
+        localStorage.setItem('burnedBySession', burnSessionId);
+      }
+    } catch (e) { /* best-effort */ }
+  });
+
+  /* ============================================
      THEME TOGGLE
   ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
   const icons = {
-    light: `<svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="12" cy="12" r="4" fill="#FFC107"/><g stroke="#FFC107" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"/><path d="M5.5 5.5l1.77 1.77M16.73 16.73l1.77 1.77M5.5 18.5l1.77-1.77M16.73 7.27l1.77-1.77"/></g></svg>`,
+    light: `<svg class="icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden><circle cx="12" cy="12" r="4" fill="#FFC107"/><g stroke="#FFC107" stroke-width="1.8" stroke-linecap[...]`
     dark: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#90CAF9"/></svg>`
   };
   function applyTheme(theme) {
