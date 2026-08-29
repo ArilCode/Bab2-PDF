@@ -11,7 +11,7 @@ function openWebsite() {
   document.documentElement.classList.remove('locked'); 
   const lockScreen = document.getElementById("lockScreen");
   const mainContent = document.getElementById("mainContent");
-  if(lockScreen) lockScreen.style.display = "none"; // JANGAN REMOVE
+  if(lockScreen) lockScreen.style.display = "none";
   if(mainContent) mainContent.style.display = "block";
 }
 
@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
+  // HASH SHA256 DARI KODE
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - VERSI FINAL FIX SEMUA
+     INITIAL LOAD CHECK - VERSI FINAL KODE 2 = 1 SESI
   ============================================ */
   function handlePageState() {
     // 1. TANGGAL BUKA PALING TINGGI
@@ -57,21 +58,29 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 3. CEK KODE 1 & 2 DARI LOCALSTORAGE
-    const accessGranted = localStorage.getItem("accessGranted");
-    const burnedCode = localStorage.getItem("burnedCode");
-
-    if (accessGranted === "permanent") {
-      openWebsite(); // Kode 1
-    } else if (accessGranted === "burn") {
-      if(burnedCode === CODE2_BURN){
-        openWebsite(); // Kode 2 masih bisa dipake
-      } else {
-        showLockScreen(); // Kode 2 udah hangus
-      }
-    } else {
-      showLockScreen(); 
+    // 3. CEK KODE 1 - PERMANEN PAKE LOCALSTORAGE
+    if (localStorage.getItem("accessGranted") === "permanent") {
+      openWebsite(); 
+      return;
     }
+
+    // 4. CEK KODE 2 - 1 SESI PAKE SESSIONSTORAGE
+    const isBurnSessionActive = sessionStorage.getItem("accessType") === "burn";
+    const isBurned = localStorage.getItem("burnedCode") === CODE2_BURN;
+
+    if (isBurnSessionActive && !isBurned) {
+      openWebsite(); // Masih dalam 1 sesi dan belum hangus
+      return;
+    }
+    
+    // 5. KALAU ADA JEJAK HANGUS TAPI SESSION MATI = TENDANG
+    if(isBurned){
+      showLockScreen();
+      return;
+    }
+
+    // 6. DEFAULT
+    showLockScreen(); 
   }
   
   handlePageState(); 
@@ -132,8 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const inputHash = await hashCode(kodeInput);
-    const burnedCode = localStorage.getItem("burnedCode");
-    const isBurned = burnedCode !== null && burnedCode === CODE2_BURN;
+    const isBurned = localStorage.getItem("burnedCode") === CODE2_BURN;
 
     // TYPE 1: PERMANEN
     if (inputHash === CODE1_PERMANENT) {
@@ -142,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // TYPE 2: 1X PAKAI
+    // TYPE 2: 1 SESI
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
         if(errorMsg){ 
@@ -154,8 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN);
-        localStorage.setItem("accessGranted", "burn");
+        localStorage.setItem("burnedCode", CODE2_BURN); // Kasih tanda "udah dipake"
+        sessionStorage.setItem("accessType", "burn"); // Kasih izin "sedang login"
         openWebsite();
         return;
       }
