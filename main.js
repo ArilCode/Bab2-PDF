@@ -8,7 +8,7 @@ function getWIBDate() {
 }
 
 function openWebsite() {
-  document.documentElement.classList.remove('locked'); 
+  document.documentElement.classList.remove('locked');
   const lockScreen = document.getElementById("lockScreen");
   const mainContent = document.getElementById("mainContent");
   if(lockScreen) lockScreen.style.display = "none";
@@ -23,13 +23,37 @@ function showLockScreen() {
   if(mainContent) mainContent.style.display = "none";
 }
 
+/* COOKIE HELPER */
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i=0;i < ca.length;i++) {
+    let c = ca[i];
+    while (c.charAt(0)==' ') c = c.substring(1,c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+function eraseCookie(name) {
+  document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
 /* ============================================
    MAIN APPLICATION LOGIC
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  
+
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
-  
+
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
@@ -39,17 +63,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const togglePassword = document.getElementById('togglePassword');
   const submitBtn = document.getElementById('submitBtn');
   const body = document.body;
-  
+
   /* ============================================
-     INITIAL LOAD CHECK - FIX KODE 2 ONLINE
+     INITIAL LOAD CHECK - PAKE COOKIE
   ============================================ */
   function handlePageState() {
-    let isPermanent = localStorage.getItem("accessType") === "permanent";
+    let isPermanent = getCookie("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
     let isTempActive = sessionStorage.getItem("tempAccessActive") === "true";
-    let burnedCodeInStorage = localStorage.getItem("burnedCode");
+    let burnedCodeInCookie = getCookie("burnedCode");
 
-    // KUNCI 1: KALAU KETEMU FLAG KODE 3, LANGSUNG HAPUS DAN KICK
+    // KUNCI 1: KODE 3 SELF DESTRUCT
     if (isTempActive) {
       sessionStorage.removeItem("tempAccessActive");
       sessionStorage.removeItem("accessType");
@@ -57,21 +81,21 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // KUNCI 2: KALAU KODE 2 UDAH DIPAKE TAPI SESSION KEHAPUS, TETAP KICK
-    if (burnedCodeInStorage === CODE2_BURN && !isBurn) {
+    // KUNCI 2: KODE 2 CEK DARI COOKIE
+    if (burnedCodeInCookie === CODE2_BURN &&!isBurn) {
       showLockScreen();
       return;
     }
 
     if (isPermanent || isBurn || new Date() >= OPEN_DATE_WIB) {
-      openWebsite(); 
+      openWebsite();
     } else {
-      showLockScreen(); 
+      showLockScreen();
     }
   }
-  
-  handlePageState(); 
-  
+
+  handlePageState();
+
   /* ============================================
      COUNTDOWN TIMER
   ============================================ */
@@ -94,19 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const timerInterval = setInterval(updateTimer, 1000);
   updateTimer();
-  
+
   /* ============================================
      PASSWORD VISIBILITY TOGGLE
   ============================================ */
   if(togglePassword && accessCode) {
     togglePassword.addEventListener('click', function() {
-      const type = accessCode.getAttribute('type') === 'password' ? 'text' : 'password';
+      const type = accessCode.getAttribute('type') === 'password'? 'text' : 'password';
       accessCode.setAttribute('type', type);
       this.classList.toggle('fa-eye');
       this.classList.toggle('fa-eye-slash');
     });
   }
-  
+
   /* ============================================
      HASHING FUNCTION - SHA256
   ============================================ */
@@ -115,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
-  
+
   /* ============================================
      ACCESS CODE VALIDATION
   ============================================ */
@@ -128,40 +152,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const inputHash = await hashCode(kodeInput);
-    const burnedCodeInStorage = localStorage.getItem("burnedCode");
-    const isBurned = burnedCodeInStorage !== null && burnedCodeInStorage === CODE2_BURN;
+    const burnedCodeInCookie = getCookie("burnedCode");
+    const isBurned = burnedCodeInCookie!== null && burnedCodeInCookie === CODE2_BURN;
 
-    // TYPE 1: PERMANENT CODE
+    // TYPE 1: PERMANENT CODE - SIMPAN DI COOKIE 365 HARI
     if (inputHash === CODE1_PERMANENT) {
-      localStorage.setItem("accessType", "permanent");
-      sessionStorage.removeItem("accessType"); 
+      setCookie("accessType", "permanent", 365);
+      sessionStorage.removeItem("accessType");
       sessionStorage.removeItem("tempAccessActive");
       openWebsite();
       return;
     }
 
-    // TYPE 2: ONE-TIME BURN CODE - FIX UTAMA DI SINI
+    // TYPE 2: ONE-TIME BURN CODE - SIMPAN DI COOKIE
     if (inputHash === CODE2_BURN) {
-      if (isBurned) { 
-        if(errorMsg){ 
-          errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
-          errorMsg.classList.add("show"); 
-          accessCode.value = ""; 
+      if (isBurned) {
+        if(errorMsg){
+          errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!";
+          errorMsg.classList.add("show");
+          accessCode.value = "";
           accessCode.focus();
-          setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500); 
+          setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500);
         }
-        return; 
+        return;
       } else {
-        // KUNCI: SET 2 DUA NYA SEKALIGUS. JADI WALAU SESSION KEHAPUS, LOCALSTORAGE UDAH NGANCI
-        localStorage.setItem("burnedCode", CODE2_BURN);
+        setCookie("burnedCode", CODE2_BURN, 365); // KUNCI: PAKE COOKIE
         sessionStorage.setItem("accessType", "burn");
         sessionStorage.removeItem("tempAccessActive");
         openWebsite();
         return;
       }
     }
-    
-    // TYPE 3: ONE-TIME RESET CODE
+
+    // TYPE 3: ONE-TIME RESET CODE - TETAP PAKE SESSION
     if (inputHash === CODE3_RESET) {
       sessionStorage.setItem("tempAccessActive", "true");
       sessionStorage.setItem("accessType", "temp");
@@ -178,10 +201,10 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500);
     }
   }
-  
+
   if(submitBtn) submitBtn.addEventListener('click', checkCode);
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
-  
+
   /* ============================================
      THEME TOGGLE
   ============================================ */
@@ -192,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dark: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#90CAF9"/></svg>`
   };
   function applyTheme(theme) {
-    if (!root || !toggleBtn) return;
+    if (!root ||!toggleBtn) return;
     if (theme === 'light') {
       root.setAttribute('data-theme', 'light');
       toggleBtn.innerHTML = icons.dark;
@@ -210,8 +233,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if(toggleBtn){
     toggleBtn.addEventListener('click', () => {
-      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-      const next = current === 'dark' ? 'light' : 'dark';
+      const current = root.getAttribute('data-theme') === 'light'? 'light' : 'dark';
+      const next = current === 'dark'? 'light' : 'dark';
       applyTheme(next);
       localStorage.setItem('site-theme', next);
     });
@@ -242,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   document.addEventListener('click', (e) => {
-    if (aboutSection && !aboutSection.contains(e.target) && btnTentang && !btnTentang.contains(e.target)) resetAll();
+    if (aboutSection &&!aboutSection.contains(e.target) && btnTentang &&!btnTentang.contains(e.target)) resetAll();
   });
   if(aboutSection) aboutSection.addEventListener('click', (e) => { e.stopPropagation(); resetAll(); });
 
@@ -259,9 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
   downloadBtns.forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const url = btn.getAttribute('href');
-      try { 
-        const res = await fetch(url, { method: 'GET' }); 
-        if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); } 
+      try {
+        const res = await fetch(url, { method: 'GET' });
+        if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); }
       }
       catch (err) { e.preventDefault(); showPopup('File belum bisa di akses'); }
     });
