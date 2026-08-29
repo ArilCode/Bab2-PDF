@@ -1,6 +1,5 @@
 /* ============================================
    UTILITY FUNCTIONS
-   Helper functions for time and website access
 ============================================ */
 function getWIBDate() {
   const now = new Date();
@@ -24,33 +23,20 @@ function showLockScreen() {
   if(mainContent) mainContent.style.display = "none";
 }
 
-/* TANDAI REFRESH HANYA KALAU BUKAN BARU LOGIN */
-window.addEventListener('pagehide', function() {
-  if (!sessionStorage.getItem('justLoggedIn')) {
-    sessionStorage.setItem('isReloading', 'true');
-  }
-});
-
 /* ============================================
    MAIN APPLICATION LOGIC
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   
-  /* ============================================
-     ACCESS CODE CONFIGURATION - HASHED
-  ============================================ */
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
   // Kode 1: Permanent - ARIL2026
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
-  
-  // Kode 2: Burn 1x - GURU2026. Tahan F5, mati kalau tutup tab
+  // Kode 2: Burn 1x - GURU2026
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
-  
   // Kode 3: Reset tiap reload - ADMIN2026
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
 
-  /* DOM Element References */
   const accessCode = document.getElementById("accessCode");
   const errorMsg = document.getElementById("errorMsg");
   const togglePassword = document.getElementById('togglePassword');
@@ -58,27 +44,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - ANTI KEDIP + ANTI REFRESH KODE 3
+     INITIAL LOAD CHECK - SELF DESTRUCT UNTUK KODE 3
   ============================================ */
   function handlePageState() {
-    const isReloading = sessionStorage.getItem('isReloading');
-    sessionStorage.removeItem('isReloading');
-    sessionStorage.removeItem('justLoggedIn');
-    
     let isPermanent = localStorage.getItem("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
     let isTemp = sessionStorage.getItem("accessType") === "temp";
 
-    // KUNCI: KALAU KODE 3 DAN INI REFRESH, HAPUS
-    if (isTemp && isReloading) {
-      sessionStorage.removeItem("accessType");
-      isTemp = false;
+    // KUNCI: KALAU KETEMU KODE 3, LANGSUNG HAPUS DAN TENDANG
+    if (isTemp) {
+      sessionStorage.removeItem("accessType"); // self destruct
+      showLockScreen();
+      return;
     }
 
-    if (isPermanent || isBurn || isTemp || new Date() >= OPEN_DATE_WIB) {
-      openWebsite(); // langsung buka, ga kedip
+    if (isPermanent || isBurn || new Date() >= OPEN_DATE_WIB) {
+      openWebsite(); 
     } else {
-      showLockScreen(); // langsung login, ga kedip
+      showLockScreen(); 
     }
   }
   
@@ -90,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateTimer() {
     const now = getWIBDate();
     const diff = OPEN_DATE_WIB - now;
-    
     if (diff <= 0) {
       openWebsite();
       clearInterval(timerInterval);
@@ -98,16 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
       return;
     }
-    
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    
     const timerEl = document.getElementById("timer");
     if(timerEl) timerEl.innerHTML = `<span>${d}H</span> <span>${h}J</span> <span>${m}M</span> <span>${s}D</span>`;
   }
-  
   const timerInterval = setInterval(updateTimer, 1000);
   updateTimer();
   
@@ -133,12 +112,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   /* ============================================
-     ACCESS CODE VALIDATION - SUDAH DI FIX
+     ACCESS CODE VALIDATION
   ============================================ */
   async function checkCode() {
     if(!accessCode) return;
     const kodeInput = accessCode.value.trim();
-    
     if(kodeInput === "") {
       if(errorMsg){ errorMsg.innerText = "Kode tidak boleh kosong!"; errorMsg.classList.add("show"); setTimeout(() => errorMsg.classList.remove("show"), 2500); }
       return;
@@ -146,11 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const inputHash = await hashCode(kodeInput);
     const burnedCodeInStorage = localStorage.getItem("burnedCode");
-    
-    // FIX PENTING: harus bener2 sama dengan hash nya baru hangus
     const isBurned = burnedCodeInStorage !== null && burnedCodeInStorage === CODE2_BURN;
-
-    sessionStorage.setItem('justLoggedIn', 'true'); // TANDAI BARU LOGIN
 
     // TYPE 1: PERMANENT CODE
     if (inputHash === CODE1_PERMANENT) {
@@ -163,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // TYPE 2: ONE-TIME BURN CODE
     if (inputHash === CODE2_BURN) {
       if (isBurned) { 
-        sessionStorage.removeItem('justLoggedIn');
         if(errorMsg){ 
           errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
           errorMsg.classList.add("show"); 
@@ -173,14 +146,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN); // baru diset hangus disini
+        localStorage.setItem("burnedCode", CODE2_BURN);
         sessionStorage.setItem("accessType", "burn");
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE
+    // TYPE 3: ONE-TIME RESET CODE - SIMPAN DULU, NANTI DIHAPUS PAS LOAD BERIKUTNYA
     if (inputHash === CODE3_RESET) {
       sessionStorage.setItem("accessType", "temp");
       openWebsite();
@@ -188,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // INVALID CODE
-    sessionStorage.removeItem('justLoggedIn');
     if(errorMsg){
       errorMsg.innerText = `"${kodeInput}" kode akses salah`;
       errorMsg.classList.add("show");
@@ -202,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
   /* ============================================
-     THEME TOGGLE FUNCTIONALITY
+     THEME TOGGLE
   ============================================ */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
@@ -238,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
 
   /* ============================================
-     NAVIGATION & ABOUT SECTION HIGHLIGHT
+     NAVIGATION & ABOUT & POPUP & PDF
   ============================================ */
   const navLinks = document.querySelectorAll('.nav-links a');
   const aboutSection = document.querySelector('.about');
@@ -265,9 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if(aboutSection) aboutSection.addEventListener('click', (e) => { e.stopPropagation(); resetAll(); });
 
-  /* ============================================
-     POPUP MODAL SYSTEM
-  ============================================ */
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popup-text');
   const popupClose = document.querySelector('.popup-close');
@@ -277,9 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if(popup) popup.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
 
-  /* ============================================
-     PDF DOWNLOAD VALIDATION
-  ============================================ */
   const downloadBtns = document.querySelectorAll('.btn-outline[href$=".pdf"]');
   downloadBtns.forEach(btn => {
     btn.addEventListener('click', async (e) => {
