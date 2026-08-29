@@ -1,5 +1,6 @@
 /* ============================================
    UTILITY FUNCTIONS
+   Helper functions for time and website access
 ============================================ */
 function getWIBDate() {
   const now = new Date();
@@ -29,13 +30,18 @@ function showLockScreen() {
 document.addEventListener("DOMContentLoaded", () => {
   
   /* ============================================
-     ACCESS CODE CONFIGURATION
+     ACCESS CODE CONFIGURATION - HASHED
   ============================================ */
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
-  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
-  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
-  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
+  // Kode 1: Permanent - ARIL2026
+  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
+  
+  // Kode 2: Burn 1x - GURU2026. Tahan F5, mati kalau tutup tab
+  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
+  
+  // Kode 3: Reset tiap reload - ADMIN2026
+  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
 
   /* DOM Element References */
   const accessCode = document.getElementById("accessCode");
@@ -82,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   /* ============================================
-     HASHING FUNCTION
+     HASHING FUNCTION - SHA256
   ============================================ */
   async function hashCode(code) {
     const msgBuffer = new TextEncoder().encode(code);
@@ -91,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   /* ============================================
-     ACCESS CODE VALIDATION - FINAL LOGIC
+     ACCESS CODE VALIDATION
   ============================================ */
   async function checkCode() {
     if(!accessCode) return;
@@ -125,15 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("burnedCode", CODE2_BURN); // Tandai hangus
-        openWebsite(); // Buka tapi ga simpan apa2. Reload = balik lock
+        localStorage.setItem("burnedCode", CODE2_BURN);
+        sessionStorage.setItem("accessType", "burn");
+        openWebsite();
         return;
       }
     }
     
     // TYPE 3: ONE-TIME RESET CODE
     if (inputHash === CODE3_RESET) {
-      openWebsite(); // Buka tapi ga simpan apa2. Reload = balik lock
+      sessionStorage.setItem("accessType", "temp");
+      openWebsite();
       return;
     }
 
@@ -151,19 +159,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
   
   /* ============================================
-     INITIAL LOAD CHECK - FIX FLICKER
-     Hanya permanent yang bisa auto login. 2 & 3 wajib login ulang
+     INITIAL LOAD CHECK
   ============================================ */
-  const accessType = localStorage.getItem("accessType");
+  const accessTypeLocal = localStorage.getItem("accessType");
+  const accessTypeSession = sessionStorage.getItem("accessType");
   
-  if (accessType === "permanent") {
-    body.classList.remove('locked'); // cegah flicker
+  if (accessTypeLocal === "permanent" || new Date() >= OPEN_DATE_WIB) {
+    body.classList.remove('locked');
     openWebsite();
-  } else if (new Date() >= OPEN_DATE_WIB) {
+  } else if (accessTypeSession === "burn" || accessTypeSession === "temp") {
     body.classList.remove('locked');
     openWebsite();
   } else {
-    // Default: tampilkan lockscreen. Kode 2 & 3 ga ada yg disimpen
     showLockScreen();
   }
   
@@ -250,7 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
   downloadBtns.forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const url = btn.getAttribute('href');
-      try { const res = await fetch(url, { method: 'GET' }); if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); } }
+      try { 
+        const res = await fetch(url, { method: 'GET' }); 
+        if (!res.ok) { e.preventDefault(); showPopup('File belum bisa di akses'); } 
+      }
       catch (err) { e.preventDefault(); showPopup('File belum bisa di akses'); }
     });
   });
