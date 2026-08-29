@@ -44,18 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
-     INITIAL LOAD CHECK - SELF DESTRUCT UNTUK KODE 3
+     INITIAL LOAD CHECK - BRUTAL MODE UNTUK KODE 3
   ============================================ */
   function handlePageState() {
     let isPermanent = localStorage.getItem("accessType") === "permanent";
     let isBurn = sessionStorage.getItem("accessType") === "burn";
     let isTemp = sessionStorage.getItem("accessType") === "temp";
 
-    // KUNCI: KALAU KETEMU KODE 3, LANGSUNG HAPUS DAN TENDANG
+    // BRUTAL: KALAU KETEMU TEMP LANGSUNG HAPUS DAN KICK
     if (isTemp) {
-      sessionStorage.removeItem("accessType"); // self destruct
+      sessionStorage.removeItem("accessType");
       showLockScreen();
-      return;
+      return; // STOP DISINI
     }
 
     if (isPermanent || isBurn || new Date() >= OPEN_DATE_WIB) {
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    // TYPE 3: ONE-TIME RESET CODE - SIMPAN DULU, NANTI DIHAPUS PAS LOAD BERIKUTNYA
+    // TYPE 3: ONE-TIME RESET CODE - CUMA SET 1 KALI
     if (inputHash === CODE3_RESET) {
       sessionStorage.setItem("accessType", "temp");
       openWebsite();
