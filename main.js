@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const OPEN_DATE_WIB = new Date('2026-09-03T08:00:00+07:00');
   
-  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3"; // ARIL2026
-  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c"; // GURU2026
-  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810"; // ADMIN2026
+  const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
+  const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
+  const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
 
   const accessCode = document.getElementById("accessCode");
   const errorMsg = document.getElementById("errorMsg");
@@ -41,10 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   
   /* ============================================
+     TAMBAHAN: DETEKSI TUTUP TAB
+  ============================================ */
+  window.addEventListener('pagehide', () => {
+    if(!sessionStorage.getItem('justLoggedIn')){
+      sessionStorage.setItem("wasClosed", "1");
+    }
+  });
+
+  /* ============================================
      INITIAL LOAD CHECK - FIX F5 VS TUTUP TAB
   ============================================ */
   function handlePageState() {
-    // 1. TANGGAL BUKA PALING TINGGI
     if (new Date() >= OPEN_DATE_WIB) {
       openWebsite();
       return;
@@ -52,48 +60,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const loginType = localStorage.getItem("loginType");
     const burnUsed = localStorage.getItem("burnUsed") === "1";
-    const sessionFlag = sessionStorage.getItem("sessionActive"); // PENGAWAS
+    const sessionFlag = sessionStorage.getItem("sessionActive");
+    const wasClosed = sessionStorage.getItem("wasClosed");
 
-    // 2. CEK KODE 1 - PERMANEN
+    sessionStorage.removeItem("wasClosed");
+    sessionStorage.removeItem("justLoggedIn");
+
     if (loginType === "perm") {
       openWebsite(); 
       return;
     }
 
-    // 3. CEK KODE 2 - 1 SESI
     if (loginType === "burn") {
-      if(burnUsed && !sessionFlag){ // Udah dipake DAN ini buka tab baru
-        localStorage.removeItem("loginType"); // Bersihin biar rapi
+      if(burnUsed && wasClosed){
+        localStorage.removeItem("loginType");
+        localStorage.removeItem("burnUsed");
         showLockScreen();
-      } else if (!burnUsed) { // Masih dalam sesi pertama
-        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda "masih hidup"
+        return;
+      }
+      if(burnUsed && !wasClosed){
+        sessionStorage.setItem("sessionActive", "1");
         openWebsite();
-      } else { // burnUsed=true tapi sessionFlag ada = F5
-        sessionStorage.setItem("sessionActive", "1"); // Perbarui
+        return;
+      }
+      if (!burnUsed) {
+        sessionStorage.setItem("sessionActive", "1");
         openWebsite();
       }
       return;
     }
 
-    // 4. CEK KODE 3 - 1X REFRESH
     if (loginType === "temp") {
-      localStorage.removeItem("loginType"); // Langsung hapus biar 1x F5
+      localStorage.removeItem("loginType");
       showLockScreen(); 
       return;
     }
 
-    // 5. DEFAULT: BELUM LOGIN
     showLockScreen(); 
   }
   
   handlePageState(); 
-  
-  /* HAPUS PENANDA SESI PAS TUTUP TAB/BROWSER - KHUSUS KODE 2 */
-  window.addEventListener('beforeunload', () => {
-    if(localStorage.getItem("loginType") === "burn"){
-      sessionStorage.removeItem("sessionActive"); // Hapus penanda sesi
-    }
-  });
 
   /* ============================================
      COUNTDOWN TIMER
@@ -153,14 +159,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputHash = await hashCode(kodeInput);
     const burnUsed = localStorage.getItem("burnUsed") === "1";
 
-    // TYPE 1: PERMANEN
     if (inputHash === CODE1_PERMANENT) {
       localStorage.setItem("loginType", "perm");
+      sessionStorage.setItem('justLoggedIn', '1');
       openWebsite();
       return;
     }
 
-    // TYPE 2: 1 SESI
     if (inputHash === CODE2_BURN) {
       if (burnUsed) { 
         if(errorMsg){ 
@@ -172,22 +177,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return; 
       } else {
-        localStorage.setItem("loginType", "burn"); // Status login
-        localStorage.setItem("burnUsed", "1"); // Jejak hangus permanen
-        sessionStorage.setItem("sessionActive", "1"); // Kasih tanda sesi mulai
+        localStorage.setItem("loginType", "burn");
+        localStorage.setItem("burnUsed", "1");
+        sessionStorage.setItem("sessionActive", "1");
+        sessionStorage.setItem('justLoggedIn', '1');
         openWebsite();
         return;
       }
     }
     
-    // TYPE 3: 1X REFRESH
     if (inputHash === CODE3_RESET) {
       localStorage.setItem("loginType", "temp");
+      sessionStorage.setItem('justLoggedIn', '1');
       openWebsite();
       return;
     }
 
-    // INVALID CODE
     if(errorMsg){
       errorMsg.innerText = `"${kodeInput}" kode akses salah`;
       errorMsg.classList.add("show");
