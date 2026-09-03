@@ -28,7 +28,7 @@ function showLockScreen() {
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   
-  const OPEN_DATE_WIB = new Date('2026-09-03T14:00:00+07:00');
+  const OPEN_DATE_WIB = new Date('2026-09-04T10:00:00+07:00');
   
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
