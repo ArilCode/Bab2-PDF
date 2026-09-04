@@ -2,9 +2,13 @@
 <html lang="id">
 
 <head>
+  <!-- ============================================
+       META & EXTERNAL RESOURCES
+       Purpose: Document metadata, SEO, fonts and stylesheets
+  ============================================ -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Arsip PDF Kelompok. Akses dokumen tugas sekolah di sini.">
+  <meta name="description" content="Arsip PDF Kelompok. Akses dokumen tugas sekolah di sini">
   <meta name="robots" content="noindex, nofollow">
   
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
@@ -12,42 +16,54 @@
   <link rel="stylesheet" href="style.css" />
 
   <link rel="shortcut icon" href="./Image/favicon.png" type="image/x-icon" />
-  
-  <!-- ANTI KEDIP SCRIPT -->
-<!-- <script>
-  (function() {
-    const p = localStorage.getItem("loginType") === "perm";
-    const b = localStorage.getItem("loginType") === "burn" && localStorage.getItem("burnUsed") !== "1";
-    const t = sessionStorage.getItem("sessionActive") === "1";
-    document.documentElement.classList[p||b||t ? 'remove' : 'add']('locked');
-  })();
-</script> -->
   <title>ArilCode — Koleksi PDF Kelompok</title>
 </head>
 
 <body>
+  <!-- ============================================
+       LOCK SCREEN SECTION
+       Purpose: Restrict access until valid access code is entered
+       Features: Password input, error handling, theme toggle
+  ============================================ -->
   <div id="lockScreen" class="lock-screen">
     <div id="lockBox" class="lock-box">
-      <h2><span class="hourglass"></span> Web Terkunci <span class="hourglass"></span></h2>
+      <h2>Web Terkunci</h2>
       <p>Masukkan kode akses untuk membuka</p>
       
       <div class="akses-box">
-        <label><b>Akses Cepat:</b></label>
+        <!-- Access Code Input Container -->
         <div class="input-wrapper">
           <input type="password" id="accessCode" placeholder="Masukkan Kode Akses">
           <i id="togglePassword" class="fa-solid fa-eye"></i>
         </div>
+        
+        <!-- Error Message Display -->
         <p id="errorMsg" class="error"></p>
+        
+        <!-- Submit Button -->
         <button id="submitBtn">Buka Sekarang</button>
         
+        <!-- Contact Information Marquee -->
         <div class="marquee-box"><span>Hubungi Aril Jika Memiliki Kendala</span></div>
+        
+        <!-- Developer Credit -->
         <div class="credit">Directed By ARill</div>
       </div>
     </div>
   </div>
   
+  <!-- ============================================
+       MAIN CONTENT SECTION
+       Purpose: Primary website content displayed after successful authentication
+  ============================================ -->
   <div id="mainContent" style="display: none;">
+    
+    <!-- ============================================
+         SITE HEADER & NAVIGATION
+         Purpose: Global navigation, branding and hero section
+    ============================================ -->
     <header class="site-header">
+      <!-- Navigation Bar -->
       <nav class="navbar">
         <div class="brand"><a href="#home">ArilCode</a></div>
         <ul class="nav-links">
@@ -55,11 +71,16 @@
           <li><a href="https://my-all-link.vercel.app/" target="_blank" rel="noopener noreferrer">Kontak</a></li>
           <li><a href="#about">Tentang</a></li>
         </ul>
+        <!-- Theme Toggle Action -->
         <div class="actions">
           <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"></button>
         </div>
       </nav>
       
+      <!-- ============================================
+           HERO SECTION
+           Purpose: Welcome message and introduction to the archive
+      ============================================ -->
       <section id="home" class="hero">
         <div class="hero-content">
           <h1>Selamat Datang di Arsip PDF Kelompok</h1>
@@ -68,17 +89,29 @@
       </section>
     </header>
     
+    <!-- ============================================
+         MAIN CONTENT WRAPPER
+    ============================================ -->
     <main class="main">
+      
+      <!-- ============================================
+           DOWNLOADS SECTION
+           Purpose: Display and provide access to group PDF documents
+           Features: 5 document cards with download links and member avatars
+      ============================================ -->
       <section id="downloads" class="downloads container">
         <h2>Unduhan Dokumen</h2>
         <p class="muted">Klik tombol "Unduh" untuk mengambil file PDF. Tersedia 5 dokumen</p>
+        
         <div class="cards">
+          <!-- Document Card 1 -->
           <article class="card">
             <h3>Dokumen Kelompok 1</h3>
             <p>Ringkasan singkat dokumen 1</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok1.pdf" download target="_blank">Unduh PDF</a>
             </div>
+            <!-- Member Avatars Group 1 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Rivaldo">R</span>
               <span class="avatar" data-name="Irsyad">I</span>
@@ -89,6 +122,8 @@
               <span class="avatar" data-name="Rafi">R</span>
             </div>
           </article>
+          
+          <!-- Document Card 2 -->
           <article class="card">
             <h3>Dokumen Kelompok 2</h3>
             <p>Ringkasan singkat dokumen 2</p>
@@ -96,6 +131,7 @@
               <a class="btn-outline" href="./Pdf/PPTKelompok2.pdf" download target="_blank">Unduh PDF</a>
               <a class="btn-outline" href="https://arilcode.github.io/masalah-sosial-presentation/" target="_blank">Tampilkan</a>
             </div>
+            <!-- Member Avatars Group 2 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Aril">A</span>
               <span class="avatar" data-name="Fandi">F</span>
@@ -105,12 +141,15 @@
               <span class="avatar" data-name="Agri">A</span>
             </div>
           </article>
+          
+          <!-- Document Card 3 -->
           <article class="card">
             <h3>Dokumen Kelompok 3</h3>
             <p>Ringkasan singkat dokumen 3</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok3.pdf" download target="_blank">Unduh PDF</a>
             </div>
+            <!-- Member Avatars Group 3 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Keyla">K</span>
               <span class="avatar" data-name="Selvia">S</span>
@@ -118,12 +157,15 @@
               <span class="avatar" data-name="Petra">P</span>
             </div>
           </article>
+          
+          <!-- Document Card 4 -->
           <article class="card">
             <h3>Dokumen Kelompok 4</h3>
             <p>Ringkasan singkat dokumen 4</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok4.pdf" download target="_blank">Unduh PDF</a>
             </div>
+            <!-- Member Avatars Group 4 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Aini">A</span>
               <span class="avatar" data-name="Olvi">O</span>
@@ -131,12 +173,15 @@
               <span class="avatar" data-name="Nur aini">N</span>
             </div>
           </article>
+          
+          <!-- Document Card 5 -->
           <article class="card">
             <h3>Dokumen Kelompok 5</h3>
             <p>Ringkasan singkat dokumen 5</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok5.pdf" download target="_blank">Unduh PDF</a>
             </div>
+            <!-- Member Avatars Group 5 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Mayya">M</span>
               <span class="avatar" data-name="Anggun">A</span>
@@ -148,16 +193,28 @@
         </div>
       </section>
       
+      <!-- ============================================
+           ABOUT SECTION
+           Purpose: Information about the website and its purpose
+      ============================================ -->
       <section id="about" class="about container">
         <h2>Tentang</h2>
         <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses Dokumen PDF yang berkaitan dengan tugas kelompok</p>
       </section>
     </main>
     
+    <!-- ============================================
+         SITE FOOTER
+         Purpose: Copyright and legal information
+    ============================================ -->
     <footer class="site-footer">
       <div class="container"><p>© 2026 ArilCode — Arsip PDF Kelompok Sekolah</p></div>
     </footer>
     
+    <!-- ============================================
+         POPUP MODAL
+         Purpose: Display notifications and error messages to user
+    ============================================ -->
     <div id="popup" class="popup hidden">
       <div class="popup-content">
         <span class="popup-close">&times;</span>
@@ -166,6 +223,10 @@
     </div>
   </div>
   
+  <!-- ============================================
+       THEME INITIALIZATION SCRIPT
+       Purpose: Apply saved theme preference from localStorage on page load
+  ============================================ -->
   <script>
     (function() {
       const saved = localStorage.getItem('site-theme');
@@ -175,6 +236,10 @@
     })();
   </script>
   
+  <!-- ============================================
+       MAIN APPLICATION SCRIPT
+       Purpose: Handle authentication, navigation, theme toggle and interactions
+  ============================================ -->
   <script src="main.js?v=7"></script>
 </body>
 </html>

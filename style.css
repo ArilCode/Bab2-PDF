@@ -1,5 +1,6 @@
 /* ============================================
-   CSS VARIABLES & THEME DEFINITIONS
+   ROOT VARIABLES & THEME CONFIGURATION
+   Purpose: Define color palette and design tokens for dark/light theme
 ============================================ */
 :root {
   --bg-1: #0f1724;
@@ -19,13 +20,15 @@
 
 /* ============================================
    GLOBAL TRANSITIONS
+   Purpose: Smooth transition for theme switching
 ============================================ */
 :root, body, .navbar, .hero, .card, .site-footer, .btn-outline, .about, .nav-links a {
   transition: background-color 1.5s ease-in-out, background 1.5s ease-in-out, color 1.5s ease-in-out, border-color 1.5s ease-in-out, box-shadow 1.5s ease-in-out;
 }
 
 /* ============================================
-   LIGHT THEME OVERRIDES
+   LIGHT THEME OVERRIDE
+   Purpose: Alternative color scheme when data-theme="light" is active
 ============================================ */
 [data-theme="light"] {
   --bg-1: #f6f8fb;
@@ -43,12 +46,9 @@
   --avatar-border: rgba(0,0,0,0.5);
 }
 
-.preload * {
-  transition: none !important;
-}
-
 /* ============================================
-   BASE STYLES & RESET
+   BASE RESET & GLOBAL STYLES
+   Purpose: Base typography, background and layout foundation
 ============================================ */
 * { 
   box-sizing: border-box; 
@@ -71,6 +71,7 @@ body {
   transition: background-color .25s ease, color .25s ease;
 }
 
+/* Background Grid Overlay */
 body::before {
   content: "";
   position: fixed;
@@ -82,6 +83,7 @@ body::before {
   mix-blend-mode: overlay;
 }
 
+/* Scroll Lock States */
 body.locked {
   overflow: hidden;
 }
@@ -90,15 +92,26 @@ body.no-scroll {
   overflow: hidden;
 }
 
-/* ANTI KEDIP: KONTROL DARI HTML CLASS */
-html.locked #mainContent{display:none!important}
-html.locked #lockScreen{display:flex!important}
-#mainContent{display:block}
-#lockScreen{display:none}
-
 /* ============================================
    LOCK SCREEN SECTION
+   Purpose: Authentication overlay styles
 ============================================ */
+html.locked #mainContent {
+  display: none !important;
+}
+
+html.locked #lockScreen { 
+  display: flex !important;
+}
+
+#mainContent { 
+  display: block;
+}
+
+#lockScreen {
+  display: none;
+}
+
 .lock-screen {
   position: fixed; 
   top: 0; 
@@ -125,26 +138,7 @@ html.locked #lockScreen{display:flex!important}
   border-radius: 8px;
 }
 
-.hourglass {
-  display: inline-block;
-  font-size: 2rem;
-  vertical-align: middle;
-}
-
-.hourglass::before {
-  content: "⌛";
-  display: inline-block;
-  animation: hourglass-spin 2s infinite;
-}
-
-@keyframes hourglass-spin {
- 0%   { content: "⌛"; transform: rotate(0deg); } 
- 25%  { content: "⌛"; transform: rotate(0deg); }
- 50%  { content: "⏳"; transform: rotate(180deg); }
- 75%  { content: "⏳"; transform: rotate(180deg); }
- 100% { content: "⌛"; transform: rotate(360deg); }
-}
-
+/* Lock Screen Input & Button */
 .lock-box input { 
   padding: 10px; 
   border: 2px solid var(--muted);
@@ -171,6 +165,7 @@ html.locked #lockScreen{display:flex!important}
   background: var(--btn-download-hover);
 }
 
+/* Password Input Wrapper with Toggle Icon */
 .input-wrapper {
   position: relative;
   width: 100%;
@@ -179,21 +174,20 @@ html.locked #lockScreen{display:flex!important}
 
 .input-wrapper input {
   width: 100%;
+  text-align: center;
   padding-right: 40px;
   box-sizing: border-box;
 }
 
-#togglePassword {
-  position: absolute;
-  right: 12px;
-  top: 50%;
+.input-wrapper i {
+  position: absolute; 
+  right: 15px; 
+  top: 50%; 
   transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.1rem;
+  cursor: pointer; 
   color: #555;
+  font-size: 1.2rem;
 }
-
-#togglePassword:hover { color: #000; }
 
 .akses-box {
   display: flex;
@@ -204,16 +198,12 @@ html.locked #lockScreen{display:flex!important}
   width: 100%;
 }
 
-.akses-box label {
-  font-size: 1rem;
-  margin: 0;
-}
-
 .akses-box button {
   width: 100%;
   margin-top: 5px;
 }
 
+/* Error Message Display */
 .error { 
   color: red; 
   margin: 0 0 0 0;
@@ -230,6 +220,7 @@ html.locked #lockScreen{display:flex!important}
   margin-top: 5px;
 }
 
+/* Animated Marquee Text */
 .marquee-box {
   width: 100%;
   margin-top: 15px;
@@ -264,7 +255,7 @@ html.locked #lockScreen{display:flex!important}
 }
 
 /* ============================================
-   MAIN CONTENT SECTION
+   MAIN CONTENT & LAYOUT CONTAINER
 ============================================ */
 #mainContent { 
   display: none;
@@ -277,7 +268,8 @@ html.locked #lockScreen{display:flex!important}
 }
 
 /* ============================================
-   HEADER & NAVIGATION
+   SITE HEADER & NAVIGATION BAR
+   Purpose: Sticky navigation with branding and theme toggle
 ============================================ */
 .site-header {
   position: sticky;
@@ -331,6 +323,7 @@ html.locked #lockScreen{display:flex!important}
   color: var(--text); 
 }
 
+/* Theme Toggle Button */
 #theme-toggle {
   background: transparent;
   border: 0;
@@ -354,6 +347,7 @@ section {
 
 /* ============================================
    HERO SECTION
+   Purpose: Welcome banner with glassmorphism effect
 ============================================ */
 .hero {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
@@ -395,6 +389,7 @@ section {
 
 /* ============================================
    DOWNLOADS SECTION
+   Purpose: Grid layout for document cards
 ============================================ */
 .downloads {
   padding: 2rem 1rem;
@@ -416,6 +411,10 @@ section {
   margin-top: 1rem; 
 }
 
+/* ============================================
+   DOCUMENT CARD COMPONENT
+   Purpose: Individual group document card with actions
+============================================ */
 .card {
   background: var(--card);
   border-radius: 10px;
@@ -445,6 +444,7 @@ section {
   flex-wrap: wrap;
 }
 
+/* Download Button */
 .btn-outline {
   background: var(--btn-download);
   color: #fff;
@@ -461,7 +461,8 @@ section {
 }
 
 /* ============================================
-   MEMBER AVATARS
+   MEMBER AVATARS COMPONENT
+   Purpose: Circular avatars with hover tooltip
 ============================================ */
 .member-avatars {
   display: flex;
@@ -499,6 +500,7 @@ section {
   border-color: var(--btn-download);
 }
 
+/* Avatar Name Tooltip */
 .avatar::after {
   content: attr(data-name);
   position: absolute;
@@ -542,6 +544,7 @@ section {
 
 /* ============================================
    ABOUT SECTION
+   Purpose: Information section with active highlight state
 ============================================ */
 .about {
   max-width: 100%;
@@ -570,7 +573,8 @@ section {
 }
 
 /* ============================================
-   FOOTER SECTION
+   SITE FOOTER
+   Purpose: Copyright and footer information
 ============================================ */
 .site-footer {
   margin-top: 2rem;
@@ -580,7 +584,8 @@ section {
 }
 
 /* ============================================
-   GLOBAL POPUP MODAL
+   POPUP MODAL COMPONENT
+   Purpose: Notification and alert dialog
 ============================================ */
 .popup {
   position: fixed;
@@ -633,6 +638,7 @@ section {
 
 /* ============================================
    RESPONSIVE MEDIA QUERIES
+   Purpose: Mobile and tablet layout adjustments
 ============================================ */
 @media (max-width: 400px) {
   .lock-box {
