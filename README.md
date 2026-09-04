@@ -20,14 +20,14 @@ arilcode-pdf-archive/
 ├── https://github.com/ArilCode/Bab2-PDF/blob/main/README.md      
 ### Folder penyimpanan PDF
 ├── /Pdf/                       
-│   ├── https://github.com/ArilCode/Bab2-PDF/blob/main/Pdf/PPTKelompok1.pdf      
-│   ├── http://PPTKelompok2.pdf      
-│   ├── http://PPTKelompok3.pdf       
-│   ├── http://PPTKelompok4.pdf      
-└   └── http://PPTKelompok5.pdf
+│   ├── PPTKelompok1.pdf      
+│   ├── PPTKelompok2.pdf      
+│   ├── PPTKelompok3.pdf       
+│   ├── PPTKelompok4.pdf      
+└   └── PPTKelompok5.pdf
 # Folder gambar
 └── /Image/                     
-└    └── http://favicon.png
+└    └── favicon.png
 
 
 ---
