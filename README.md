@@ -19,11 +19,11 @@ arilcode-pdf-archive/
 ### Dokumentasi ini
 ├── http://README.md      
 ### Folder penyimpanan PDF
-├── /Pdf/           
-├── http://PPTKelompok1.pdf
-├── http://PPTKelompok2.pdf
-├── http://PPTKelompok3.pdf
-├── http://PPTKelompok4.pdf
+├── /Pdf/           │
+│  ├── http://PPTKelompok1.pdf
+│  ├── http://PPTKelompok2.pdf
+│  ├── http://PPTKelompok3.pdf
+│  ├── http://PPTKelompok4.pdf
 └── http://PPTKelompok5.pdf
 # Folder gambar
 └── /Image/             
