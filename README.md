@@ -13,14 +13,14 @@ arilcode-pdf-archive/
 ### Halaman utama + Lock Screen
 ├── https://github.com/ArilCode/Bab2-PDF/blob/main/index.html        
 ### Styling, Tema, Responsive  
-├── https://pdf-bab2.vercel.app/style.css     
+├── https://github.com/ArilCode/Bab2-PDF/blob/main/style.css     
 ### Logic: Auth, Theme, Navigasi
-├── https://pdf-bab2.vercel.app/main.js?v=7       
+├── https://github.com/ArilCode/Bab2-PDF/blob/main/main.js?v=7       
 ### Dokumentasi ini
-├── https://pdf-bab2.vercel.app/README.md      
+├── https://github.com/ArilCode/Bab2-PDF/blob/main/README.md      
 ### Folder penyimpanan PDF
 ├── /Pdf/                       
-│   ├── https://pdf-bab2.vercel.app/Pdf/PPTKelompok1.pdf      
+│   ├── https://github.com/ArilCode/Bab2-PDF/blob/main/Pdf/PPTKelompok1.pdf      
 │   ├── http://PPTKelompok2.pdf      
 │   ├── http://PPTKelompok3.pdf       
 │   ├── http://PPTKelompok4.pdf      
