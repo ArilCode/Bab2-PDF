@@ -2,23 +2,23 @@
 
 Website arsip dokumen PDF untuk tugas kelompok sekolah. Dilengkapi sistem akses, tema dark/light, dan tampilan responsive.
 
-**Dibuat oleh:** ARill  
+**Dibuat oleh:** Arill  
 **Versi:** v7  
-**Tanggal:** September 2026
+**Tanggal:** 04 September 2026
 
 ---
 
-## 📁 STRUKTUR FILE
+# 📁 STRUKTUR FILE
 arilcode-pdf-archive/
-# Halaman utama + Lock Screen
+### Halaman utama + Lock Screen
 ├── http://index.html        
-# Styling, Tema, Responsive  
+### Styling, Tema, Responsive  
 ├── http://style.css     
-# Logic: Auth, Theme, Navigasi
+### Logic: Auth, Theme, Navigasi
 ├── http://main.js       
-# Dokumentasi ini
+### Dokumentasi ini
 ├── http://README.md      
-# Folder penyimpanan PDF
+### Folder penyimpanan PDF
 ├── /Pdf/               
 │   ├── http://PPTKelompok1.pdf
 │   ├── http://PPTKelompok2.pdf
@@ -117,7 +117,7 @@ Jangan lupa ganti link PDF dan nama anggota di `.member-avatars`
 ---
 
 ## 📞 BANTUAN
-Jika ada kendala akses silakan hubungi: **Aril**  
+Jika ada kendala akses silakan hubungi: **Arill**  
 Link: https://my-all-link.vercel.app/
 
 ---
