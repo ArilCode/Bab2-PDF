@@ -11,16 +11,16 @@ Website arsip dokumen PDF untuk tugas kelompok sekolah. Dilengkapi sistem akses,
 # 📁 STRUKTUR FILE
 arilcode-pdf-archive/
 ### Halaman utama + Lock Screen
-├── http://index.html        
+├── https://pdf-bab2.vercel.app/index.html        
 ### Styling, Tema, Responsive  
-├── http://style.css     
+├── https://pdf-bab2.vercel.app/style.css     
 ### Logic: Auth, Theme, Navigasi
-├── http://main.js       
+├── https://pdf-bab2.vercel.app/main.js?v=7       
 ### Dokumentasi ini
-├── http://README.md      
+├── https://pdf-bab2.vercel.app/README.md      
 ### Folder penyimpanan PDF
 ├── /Pdf/                       
-│   ├── http://PPTKelompok1.pdf      
+│   ├── https://pdf-bab2.vercel.app/Pdf/PPTKelompok1.pdf      
 │   ├── http://PPTKelompok2.pdf      
 │   ├── http://PPTKelompok3.pdf       
 │   ├── http://PPTKelompok4.pdf      
