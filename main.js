@@ -1,12 +1,6 @@
 /* ============================================
    UTILITY FUNCTIONS
 ============================================ */
-function getWIBDate() {
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  return new Date(utc + (3600000 * 7));
-}
-
 function openWebsite() {
   document.documentElement.classList.remove('locked'); 
   const lockScreen = document.getElementById("lockScreen");
@@ -28,8 +22,7 @@ function showLockScreen() {
 ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
   
-  const OPEN_DATE_WIB = new Date('2026-09-04T10:00:00+07:00');
-  
+  // KODE AKSES PAKAI PUNYA LOGIC 2
   const CODE1_PERMANENT = "377d5f728ea650492e175b762912e0bdb3e94ea0e42428824c40419531fdcea3";
   const CODE2_BURN = "83ddf99bad01119a253b475dfe25ac22a3aef62de5aae568e399f470caab806c";
   const CODE3_RESET = "c670799c644ac177a66842637b507c6b80991319c716df11d702ea33306ed810";
@@ -40,93 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitBtn = document.getElementById('submitBtn');
   const body = document.body;
   
-  /* ============================================
-     TAMBAHAN: DETEKSI TUTUP TAB
-  ============================================ */
-  window.addEventListener('pagehide', () => {
-    if(!sessionStorage.getItem('justLoggedIn')){
-      sessionStorage.setItem("wasClosed", "1");
-    }
-  });
-
-  /* ============================================
-     INITIAL LOAD CHECK - FIX F5 VS TUTUP TAB
-  ============================================ */
-  function handlePageState() {
-    if (new Date() >= OPEN_DATE_WIB) {
+  /* CHECK ACCESS - SISTEM MIRIP LOGIC 1 */
+  function checkAccess() {
+    const perm = localStorage.getItem("access_perm"); // Kode 1
+    const burn = sessionStorage.getItem("burn_session"); // Kode 2 aktif di tab ini
+    
+    if (perm || burn) {
       openWebsite();
-      return;
+    } else {
+      showLockScreen();
     }
-
-    const loginType = localStorage.getItem("loginType");
-    const burnUsed = localStorage.getItem("burnUsed") === "1";
-    const sessionFlag = sessionStorage.getItem("sessionActive");
-    const wasClosed = sessionStorage.getItem("wasClosed");
-
-    sessionStorage.removeItem("wasClosed");
-    sessionStorage.removeItem("justLoggedIn");
-
-    if (loginType === "perm") {
-      openWebsite(); 
-      return;
-    }
-
-    if (loginType === "burn") {
-      if(burnUsed && wasClosed){
-        localStorage.removeItem("loginType");
-        localStorage.removeItem("burnUsed");
-        showLockScreen();
-        return;
-      }
-      if(burnUsed && !wasClosed){
-        sessionStorage.setItem("sessionActive", "1");
-        openWebsite();
-        return;
-      }
-      if (!burnUsed) {
-        sessionStorage.setItem("sessionActive", "1");
-        openWebsite();
-      }
-      return;
-    }
-
-    if (loginType === "temp") {
-      localStorage.removeItem("loginType");
-      showLockScreen(); 
-      return;
-    }
-
-    showLockScreen(); 
   }
-  
-  handlePageState(); 
 
-  /* ============================================
-     COUNTDOWN TIMER
-  ============================================ */
-  function updateTimer() {
-    const now = getWIBDate();
-    const diff = OPEN_DATE_WIB - now;
-    if (diff <= 0) {
-      openWebsite();
-      clearInterval(timerInterval);
-      const timerEl = document.getElementById("timer");
-      if(timerEl) timerEl.innerHTML = `<span>WEB</span> <span>SUDAH</span> <span>BUKA</span>`;
-      return;
-    }
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    const timerEl = document.getElementById("timer");
-    if(timerEl) timerEl.innerHTML = `<span>${d}H</span> <span>${h}J</span> <span>${m}M</span> <span>${s}D</span>`;
-  }
-  const timerInterval = setInterval(updateTimer, 1000);
-  updateTimer();
+  checkAccess();
   
-  /* ============================================
-     PASSWORD VISIBILITY TOGGLE
-  ============================================ */
+  /* PASSWORD VISIBILITY TOGGLE */
   if(togglePassword && accessCode) {
     togglePassword.addEventListener('click', function() {
       const type = accessCode.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -136,78 +57,77 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  /* ============================================
-     HASHING FUNCTION - SHA256
-  ============================================ */
+  /* HASHING FUNCTION - SHA256 */
   async function hashCode(code) {
     const msgBuffer = new TextEncoder().encode(code);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
   
-  /* ============================================
-     ACCESS CODE VALIDATION
-  ============================================ */
-  async function checkCode() {
+  /* ACCESS CODE VALIDATION - SISTEM MIRIP LOGIC 1 */
+  async function validateCode() {
     if(!accessCode) return;
-    const kodeInput = accessCode.value.trim();
-    if(kodeInput === "") {
-      if(errorMsg){ errorMsg.innerText = "Kode tidak boleh kosong!"; errorMsg.classList.add("show"); setTimeout(() => errorMsg.classList.remove("show"), 2500); }
+    const input = accessCode.value.trim();
+    if (input === "") {
+      showError("Kode tidak boleh kosong!");
       return;
-    }
-
-    const inputHash = await hashCode(kodeInput);
-    const burnUsed = localStorage.getItem("burnUsed") === "1";
-
-    if (inputHash === CODE1_PERMANENT) {
-      localStorage.setItem("loginType", "perm");
-      sessionStorage.setItem('justLoggedIn', '1');
-      openWebsite();
-      return;
-    }
-
-    if (inputHash === CODE2_BURN) {
-      if (burnUsed) { 
-        if(errorMsg){ 
-          errorMsg.innerText = "Kode ini sudah hangus dan tidak bisa dipakai lagi!"; 
-          errorMsg.classList.add("show"); 
-          accessCode.value = ""; 
-          accessCode.focus();
-          setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500); 
-        }
-        return; 
-      } else {
-        localStorage.setItem("loginType", "burn");
-        localStorage.setItem("burnUsed", "1");
-        sessionStorage.setItem("sessionActive", "1");
-        sessionStorage.setItem('justLoggedIn', '1');
-        openWebsite();
-        return;
-      }
     }
     
-    if (inputHash === CODE3_RESET) {
-      localStorage.setItem("loginType", "temp");
-      sessionStorage.setItem('justLoggedIn', '1');
+    const inputHash = await hashCode(input);
+    let usedCodes = JSON.parse(localStorage.getItem("used_codes")) || []; // list kode yg udah kepake
+    
+    // KODE 1: PERMANENT
+    if (inputHash === CODE1_PERMANENT) {
+      localStorage.setItem("access_perm", "true");
       openWebsite();
+      accessCode.value = "";
       return;
     }
-
-    if(errorMsg){
-      errorMsg.innerText = `"${kodeInput}" kode akses salah`;
-      errorMsg.classList.add("show");
+    
+    // KODE 2: BURN + SESSION
+    if (inputHash === CODE2_BURN) {
+      if (usedCodes.includes(CODE2_BURN)) {
+        showError("Kode ini sudah hangus dan tidak bisa dipakai lagi!");
+        accessCode.value = "";
+        return;
+      }
+      usedCodes.push(CODE2_BURN);
+      localStorage.setItem("used_codes", JSON.stringify(usedCodes));
+      sessionStorage.setItem("burn_session", "true");
+      openWebsite();
       accessCode.value = "";
-      accessCode.focus();
-      setTimeout(() => { errorMsg.innerText = ""; errorMsg.classList.remove("show"); }, 2500);
+      return;
     }
+    
+    // KODE 3: SESSION ONLY
+    if (inputHash === CODE3_RESET) {
+      openWebsite();
+      accessCode.value = "";
+      return;
+    }
+    
+    showError("", input);
+    accessCode.value = "";
   }
   
-  if(submitBtn) submitBtn.addEventListener('click', checkCode);
-  if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') checkCode() });
+  /* ERROR MESSAGE: TAMPILIN KODE YANG SALAH */
+  function showError(msg, wrongCode = "") {
+    if (wrongCode !== "") {
+      errorMsg.innerHTML = ` "${wrongCode}" kode akses salah`;
+    } else {
+      errorMsg.innerHTML = `️ ${msg}`;
+    }
+    errorMsg.classList.add("show");
+
+    setTimeout(() => {
+      errorMsg.classList.remove("show");
+    }, 2500);
+  }
   
-  /* ============================================
-     THEME TOGGLE
-  ============================================ */
+  if(submitBtn) submitBtn.addEventListener('click', validateCode);
+  if(accessCode) accessCode.addEventListener('keyup', (e) => { if(e.key === 'Enter') validateCode() });
+  
+  /* THEME TOGGLE */
   const toggleBtn = document.getElementById('theme-toggle');
   const root = document.documentElement;
   const icons = {
@@ -241,9 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   initTheme();
 
-  /* ============================================
-     NAVIGATION & ABOUT & POPUP & PDF
-  ============================================ */
+  /* NAVIGATION & ABOUT & POPUP & PDF */
   const navLinks = document.querySelectorAll('.nav-links a');
   const aboutSection = document.querySelector('.about');
   const btnTentang = document.querySelector('.nav-links a[href="#about"]');

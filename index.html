@@ -2,82 +2,51 @@
 <html lang="id">
 
 <head>
-  <!-- ============================================
-       META & SEO SETUP
-       Defines character encoding, viewport, SEO meta tags, and robots directives
-  ============================================ -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Arsip PDF Kelompok akan dibuka pada 03 September 2026. Akses dokumen tugas sekolah di sini.">
+  <meta name="description" content="Arsip PDF Kelompok. Akses dokumen tugas sekolah di sini.">
   <meta name="robots" content="noindex, nofollow">
   
-  <!-- ============================================
-       EXTERNAL RESOURCES
-       Google Fonts, FontAwesome, and main stylesheet
-  ============================================ -->
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ============================================
-       FAVICON & PAGE TITLE
-  ============================================ -->
   <link rel="shortcut icon" href="./Image/favicon.png" type="image/x-icon" />
   
   <!-- ANTI KEDIP SCRIPT -->
-<script>
+<!-- <script>
   (function() {
-    const p = localStorage.getItem("accessType") === "permanent";
-    const b = sessionStorage.getItem("accessType") === "burn";
-    const t = sessionStorage.getItem("accessType") === "temp";
+    const p = localStorage.getItem("loginType") === "perm";
+    const b = localStorage.getItem("loginType") === "burn" && localStorage.getItem("burnUsed") !== "1";
+    const t = sessionStorage.getItem("sessionActive") === "1";
     document.documentElement.classList[p||b||t ? 'remove' : 'add']('locked');
   })();
-</script>
+</script> -->
   <title>ArilCode — Koleksi PDF Kelompok</title>
 </head>
 
 <body>
-  
-  <!-- ============================================
-       LOCK SCREEN SECTION
-       Displays countdown and access code input before site launch date
-  ============================================ -->
   <div id="lockScreen" class="lock-screen">
     <div id="lockBox" class="lock-box">
-      <h2><span class="hourglass"></span> Web Belum Dibuka <span class="hourglass"></span></h2>
-      <p>Web ini akan terbuka otomatis pada:</p>
-      <p><b>Jum'at, 04 September 2026 10:00 WIB</b></p>
+      <h2><span class="hourglass"></span> Web Terkunci <span class="hourglass"></span></h2>
+      <p>Masukkan kode akses untuk membuka</p>
       
-      <!-- Countdown Timer Display -->
-      <div id="timer">Memuat...</div>
-      
-      <!-- Quick Access Form -->
       <div class="akses-box">
         <label><b>Akses Cepat:</b></label>
         <div class="input-wrapper">
           <input type="password" id="accessCode" placeholder="Masukkan Kode Akses">
-          <i id="togglePassword" class="fa-solid fa-eye"></i> <!-- Toggle password visibility -->
+          <i id="togglePassword" class="fa-solid fa-eye"></i>
         </div>
-        <p id="errorMsg" class="error"></p> <!-- Error message container -->
+        <p id="errorMsg" class="error"></p>
         <button id="submitBtn">Buka Sekarang</button>
         
-        <!-- Marquee Notice -->
         <div class="marquee-box"><span>Hubungi Aril Jika Memiliki Kendala</span></div>
         <div class="credit">Directed By ARill</div>
       </div>
     </div>
   </div>
   
-  <!-- ============================================
-       MAIN CONTENT SECTION
-       Hidden until lock screen is bypassed via timer or access code
-  ============================================ -->
   <div id="mainContent" style="display: none;">
-    
-    <!-- ============================================
-         SITE HEADER & NAVIGATION
-         Contains branding, navigation links, and theme toggle
-    ============================================ -->
     <header class="site-header">
       <nav class="navbar">
         <div class="brand"><a href="#home">ArilCode</a></div>
@@ -87,13 +56,10 @@
           <li><a href="#about">Tentang</a></li>
         </ul>
         <div class="actions">
-          <!-- Theme Toggle Button: Sun/Moon icons injected via JS/CSS -->
-          <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-          </button>
+          <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"></button>
         </div>
       </nav>
       
-      <!-- Hero Section -->
       <section id="home" class="hero">
         <div class="hero-content">
           <h1>Selamat Datang di Arsip PDF Kelompok</h1>
@@ -102,28 +68,17 @@
       </section>
     </header>
     
-    <!-- ============================================
-         MAIN CONTENT AREA
-    ============================================ -->
     <main class="main">
-      
-      <!-- ============================================
-           DOWNLOADS SECTION
-           Displays PDF cards for each group with member avatars
-      ============================================ -->
       <section id="downloads" class="downloads container">
         <h2>Unduhan Dokumen</h2>
         <p class="muted">Klik tombol "Unduh" untuk mengambil file PDF. Tersedia 5 dokumen</p>
         <div class="cards">
-          
-          <!-- Group 1 Card -->
           <article class="card">
             <h3>Dokumen Kelompok 1</h3>
             <p>Ringkasan singkat dokumen 1</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok1.pdf" download target="_blank">Unduh PDF</a>
             </div>
-            <!-- Member Avatars Group 1 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Rivaldo">R</span>
               <span class="avatar" data-name="Irsyad">I</span>
@@ -134,8 +89,6 @@
               <span class="avatar" data-name="Rafi">R</span>
             </div>
           </article>
-          
-          <!-- Group 2 Card -->
           <article class="card">
             <h3>Dokumen Kelompok 2</h3>
             <p>Ringkasan singkat dokumen 2</p>
@@ -143,7 +96,6 @@
               <a class="btn-outline" href="./Pdf/PPTKelompok2.pdf" download target="_blank">Unduh PDF</a>
               <a class="btn-outline" href="https://arilcode.github.io/masalah-sosial-presentation/" target="_blank">Tampilkan</a>
             </div>
-            <!-- Member Avatars Group 2 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Aril">A</span>
               <span class="avatar" data-name="Fandi">F</span>
@@ -153,15 +105,12 @@
               <span class="avatar" data-name="Agri">A</span>
             </div>
           </article>
-  
-          <!-- Group 3 Card -->
           <article class="card">
             <h3>Dokumen Kelompok 3</h3>
             <p>Ringkasan singkat dokumen 3</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok3.pdf" download target="_blank">Unduh PDF</a>
             </div>
-            <!-- Member Avatars Group 3 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Keyla">K</span>
               <span class="avatar" data-name="Selvia">S</span>
@@ -169,15 +118,12 @@
               <span class="avatar" data-name="Petra">P</span>
             </div>
           </article>
-  
-          <!-- Group 4 Card -->
           <article class="card">
             <h3>Dokumen Kelompok 4</h3>
             <p>Ringkasan singkat dokumen 4</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok4.pdf" download target="_blank">Unduh PDF</a>
             </div>
-            <!-- Member Avatars Group 4 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Aini">A</span>
               <span class="avatar" data-name="Olvi">O</span>
@@ -185,15 +131,12 @@
               <span class="avatar" data-name="Nur aini">N</span>
             </div>
           </article>
-  
-          <!-- Group 5 Card -->
           <article class="card">
             <h3>Dokumen Kelompok 5</h3>
             <p>Ringkasan singkat dokumen 5</p>
             <div class="card-actions">
               <a class="btn-outline" href="./Pdf/PPTKelompok5.pdf" download target="_blank">Unduh PDF</a>
             </div>
-            <!-- Member Avatars Group 5 -->
             <div class="member-avatars">
               <span class="avatar" data-name="Mayya">M</span>
               <span class="avatar" data-name="Anggun">A</span>
@@ -205,28 +148,16 @@
         </div>
       </section>
       
-      <!-- ============================================
-           ABOUT SECTION
-           Provides information about the purpose of the website
-      ============================================ -->
       <section id="about" class="about container">
         <h2>Tentang</h2>
         <p>Website ini dibuat untuk mempermudah anggota kelompok dan guru mengakses Dokumen PDF yang berkaitan dengan tugas kelompok</p>
       </section>
     </main>
     
-    <!-- ============================================
-         SITE FOOTER
-         Copyright and branding information
-    ============================================ -->
     <footer class="site-footer">
       <div class="container"><p>© 2026 ArilCode — Arsip PDF Kelompok Sekolah</p></div>
     </footer>
     
-    <!-- ============================================
-         GLOBAL POPUP MODAL
-         Used for displaying avatar names and other notifications
-    ============================================ -->
     <div id="popup" class="popup hidden">
       <div class="popup-content">
         <span class="popup-close">&times;</span>
@@ -235,10 +166,6 @@
     </div>
   </div>
   
-  <!-- ============================================
-       THEME INITIALIZATION SCRIPT
-       Applies saved theme from localStorage on page load
-  ============================================ -->
   <script>
     (function() {
       const saved = localStorage.getItem('site-theme');
@@ -248,10 +175,6 @@
     })();
   </script>
   
-  <!-- ============================================
-       MAIN JAVASCRIPT FILE
-       Handles timer, access code, theme toggle, and popup logic
-  ============================================ -->
-  <script src="main.js?v=6"></script>
+  <script src="main.js?v=7"></script>
 </body>
 </html>

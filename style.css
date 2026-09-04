@@ -1,6 +1,5 @@
 /* ============================================
    CSS VARIABLES & THEME DEFINITIONS
-   Defines color palette for dark and light themes using CSS custom properties
 ============================================ */
 :root {
   --bg-1: #0f1724;
@@ -20,7 +19,6 @@
 
 /* ============================================
    GLOBAL TRANSITIONS
-   Applies smooth transitions for theme switching across main elements
 ============================================ */
 :root, body, .navbar, .hero, .card, .site-footer, .btn-outline, .about, .nav-links a {
   transition: background-color 1.5s ease-in-out, background 1.5s ease-in-out, color 1.5s ease-in-out, border-color 1.5s ease-in-out, box-shadow 1.5s ease-in-out;
@@ -28,7 +26,6 @@
 
 /* ============================================
    LIGHT THEME OVERRIDES
-   Overrides CSS variables when [data-theme="light"] is active
 ============================================ */
 [data-theme="light"] {
   --bg-1: #f6f8fb;
@@ -46,21 +43,18 @@
   --avatar-border: rgba(0,0,0,0.5);
 }
 
-/* Disable transitions during page load to prevent flicker */
 .preload * {
   transition: none !important;
 }
 
 /* ============================================
    BASE STYLES & RESET
-   Global box-sizing and base layout setup
 ============================================ */
 * { 
   box-sizing: border-box; 
 }
 
 html {
-  /* Layered background with radial gradients and linear gradient */
   background: radial-gradient(1200px 600px at 10% 10%, rgba(76,140,255,0.06), transparent 8%),
     radial-gradient(900px 500px at 95% 90%, rgba(76,140,255,0.04), transparent 8%),
     linear-gradient(180deg,var(--bg-1),var(--bg-2));
@@ -73,11 +67,10 @@ body {
   font-family: 'Patrick Hand', cursive;
   color: var(--text);
   background: transparent;
-  padding-top: 100px; /* Offset for sticky navbar */
+  padding-top: 100px;
   transition: background-color .25s ease, color .25s ease;
 }
 
-/* Subtle grid pattern overlay for texture */
 body::before {
   content: "";
   position: fixed;
@@ -89,8 +82,11 @@ body::before {
   mix-blend-mode: overlay;
 }
 
-/* Prevent body scroll when lock screen is active */
 body.locked {
+  overflow: hidden;
+}
+
+body.no-scroll {
   overflow: hidden;
 }
 
@@ -102,7 +98,6 @@ html.locked #lockScreen{display:flex!important}
 
 /* ============================================
    LOCK SCREEN SECTION
-   Full-screen overlay displayed before site launch date
 ============================================ */
 .lock-screen {
   position: fixed; 
@@ -130,7 +125,6 @@ html.locked #lockScreen{display:flex!important}
   border-radius: 8px;
 }
 
-/* Animated hourglass icon using pseudo-element */
 .hourglass {
   display: inline-block;
   font-size: 2rem;
@@ -151,7 +145,6 @@ html.locked #lockScreen{display:flex!important}
  100% { content: "⌛"; transform: rotate(360deg); }
 }
 
-/* Quick access form elements */
 .lock-box input { 
   padding: 10px; 
   border: 2px solid var(--muted);
@@ -171,6 +164,7 @@ html.locked #lockScreen{display:flex!important}
   font-size: 1.1rem;
   border-radius: 4px;
   transition: 0.2s;
+  border: none;
 }
 
 .lock-box button:hover {
@@ -189,7 +183,6 @@ html.locked #lockScreen{display:flex!important}
   box-sizing: border-box;
 }
 
-/* Password visibility toggle icon */
 #togglePassword {
   position: absolute;
   right: 12px;
@@ -221,7 +214,6 @@ html.locked #lockScreen{display:flex!important}
   margin-top: 5px;
 }
 
-/* Error message with smooth show/hide transition */
 .error { 
   color: red; 
   margin: 0 0 0 0;
@@ -238,27 +230,6 @@ html.locked #lockScreen{display:flex!important}
   margin-top: 5px;
 }
 
-/* Countdown timer display */
-#timer {
-  font-size: clamp(1.2rem, 5vw, 2rem);
-  margin: 15px 0; 
-  letter-spacing: 1px;
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-#timer span { 
-  display: inline-block; 
-  min-width: 55px; 
-  border: 2px solid var(--muted);
-  background: var(--card);
-  padding: 6px; 
-  border-radius: 4px;
-}
-
-/* Marquee animation for announcement text */
 .marquee-box {
   width: 100%;
   margin-top: 15px;
@@ -294,7 +265,6 @@ html.locked #lockScreen{display:flex!important}
 
 /* ============================================
    MAIN CONTENT SECTION
-   Hidden by default, revealed after lock screen
 ============================================ */
 #mainContent { 
   display: none;
@@ -308,7 +278,6 @@ html.locked #lockScreen{display:flex!important}
 
 /* ============================================
    HEADER & NAVIGATION
-   Sticky navbar with glassmorphism effect
 ============================================ */
 .site-header {
   position: sticky;
@@ -362,7 +331,6 @@ html.locked #lockScreen{display:flex!important}
   color: var(--text); 
 }
 
-/* Theme toggle button for switching dark/light mode */
 #theme-toggle {
   background: transparent;
   border: 0;
@@ -380,14 +348,12 @@ html.locked #lockScreen{display:flex!important}
   background: transparent;
 }
 
-/* Offset for anchor links to account for sticky header */
 section {
   scroll-margin-top: 120px;
 }
 
 /* ============================================
    HERO SECTION
-   Main welcome banner with glassmorphism background
 ============================================ */
 .hero {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
@@ -429,7 +395,6 @@ section {
 
 /* ============================================
    DOWNLOADS SECTION
-   Grid layout for PDF document cards
 ============================================ */
 .downloads {
   padding: 2rem 1rem;
@@ -444,7 +409,6 @@ section {
   color: var(--muted);
 }
 
-/* Responsive grid for document cards */
 .cards { 
   display: grid; 
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
@@ -481,7 +445,6 @@ section {
   flex-wrap: wrap;
 }
 
-/* Primary download button styling */
 .btn-outline {
   background: var(--btn-download);
   color: #fff;
@@ -499,7 +462,6 @@ section {
 
 /* ============================================
    MEMBER AVATARS
-   Circular avatars with hover tooltip showing member names
 ============================================ */
 .member-avatars {
   display: flex;
@@ -537,7 +499,6 @@ section {
   border-color: var(--btn-download);
 }
 
-/* Tooltip displaying data-name attribute */
 .avatar::after {
   content: attr(data-name);
   position: absolute;
@@ -559,7 +520,6 @@ section {
   z-index: 20;
 }
 
-/* Tooltip arrow */
 .avatar::before {
   content: '';
   position: absolute;
@@ -582,7 +542,6 @@ section {
 
 /* ============================================
    ABOUT SECTION
-   Information section with active state highlight
 ============================================ */
 .about {
   max-width: 100%;
@@ -612,7 +571,6 @@ section {
 
 /* ============================================
    FOOTER SECTION
-   Site footer with copyright information
 ============================================ */
 .site-footer {
   margin-top: 2rem;
@@ -623,7 +581,6 @@ section {
 
 /* ============================================
    GLOBAL POPUP MODAL
-   Overlay modal for notifications and avatar info
 ============================================ */
 .popup {
   position: fixed;
@@ -674,23 +631,13 @@ section {
   color: var(--text);
 }
 
-body.no-scroll {
-  overflow: hidden;
-}
-
 /* ============================================
    RESPONSIVE MEDIA QUERIES
-   Adjustments for tablets and mobile devices
 ============================================ */
 @media (max-width: 400px) {
   .lock-box {
     padding: 20px 15px;
     box-shadow: 3px 3px 0 #333;
-  }
-  
-  #timer span {
-    min-width: 45px;
-    font-size: 0.9rem;
   }
   
   .lock-box h2 {
@@ -725,7 +672,7 @@ body.no-scroll {
   }
   
   .nav-links {
-    display: none; /* Hidden on mobile, add hamburger menu later */
+    display: none;
   }
   
   .main {
