@@ -11,7 +11,7 @@ Website arsip dokumen PDF untuk tugas kelompok sekolah. Dilengkapi sistem akses,
 # 📁 STRUKTUR FILE
 arilcode-pdf-archive/
 ### Halaman utama + Lock Screen
-├── https://pdf-bab2.vercel.app/index.html        
+├── https://github.com/ArilCode/Bab2-PDF/blob/main/index.html        
 ### Styling, Tema, Responsive  
 ├── https://pdf-bab2.vercel.app/style.css     
 ### Logic: Auth, Theme, Navigasi
