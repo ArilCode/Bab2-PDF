@@ -636,6 +636,65 @@ section {
   color: var(--text);
 }
 
+
+/* ============================================
+   POPUP KODE KELOMPOK BARU
+   Purpose: Input kode 1-5 untuk akses file
+============================================ */
+/* #kodePopup .popup-content h3 { 
+  margin-top: 0; 
+  margin-bottom: 8px;
+}
+#kodePopup .popup-content p {
+  margin: 0 0 15px;
+  color: var(--muted);
+}
+#kodePopup .popup-content input {
+  background: var(--bg-2);
+  border: 2px solid var(--muted);
+  color: var(--text);
+  border-radius: 6px;
+  width: 100%; 
+  padding: 10px; 
+  margin: 10px 0; 
+  text-align: center;
+  font-size: 1rem;
+  font-family: 'Patrick Hand', cursive;
+}
+#kodePopup .popup-content button {
+  width: 100%;
+}
+#kodeError { 
+  color: red; 
+  height: 18px; 
+  margin-top: 5px;
+  font-size: 0.9rem;
+} */
+
+
+/* POPUP KODE KELOMPOK */
+#kodePopup .popup-content h3 { margin-top: 0; }
+#kodePopup .popup-content input {
+  background: var(--bg-2); border: 2px solid var(--muted);
+  color: var(--text); border-radius: 6px;
+}
+
+/* FIX ERROR KODE KELOMPOK */
+#kodeError { 
+  color: #ff4d4d; 
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  height: 0;           
+  opacity: 0;          
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+#kodeError.show { 
+  height: 18px;        
+  opacity: 1;
+}
+
+
 /* ============================================
    RESPONSIVE MEDIA QUERIES
    Purpose: Mobile and tablet layout adjustments
