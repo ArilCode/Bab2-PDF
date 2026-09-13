@@ -32,7 +32,6 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./Image/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="MyWebSite" />
   <link rel="manifest" href="./site.webmanifest" />
-  <meta name="theme-color" content="#58a6ff">
   <title>ArilCode — Koleksi PDF Kelompok</title>
 </head>
 
@@ -126,7 +125,7 @@
             <h3>Dokumen Kelompok 1</h3>
             <p>Ringkasan singkat dokumen 1</p>
             <div class="card-actions">
-              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok1.pdf" data-kode="1" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline" href="./Pdf/PPTKelompok1.pdf" download target="_blank">Unduh PDF</a>
             </div>
             <!-- Member Avatars Group 1 -->
             <div class="member-avatars">
@@ -145,8 +144,8 @@
             <h3>Dokumen Kelompok 2</h3>
             <p>Ringkasan singkat dokumen 2</p>
             <div class="card-actions">
-              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok2.pdf" data-kode="2" download target="_blank">Unduh PDF</a>
-              <a class="btn-outline secure-btn" href="https://all-my-project-theta.vercel.app/" data-kode="2" target="_blank">Tampilkan</a>
+              <a class="btn-outline" href="./Pdf/PPTKelompok2.pdf" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline" href="https://arilcode.github.io/masalah-sosial-presentation/" target="_blank">Tampilkan</a>
             </div>
             <!-- Member Avatars Group 2 -->
             <div class="member-avatars">
@@ -164,7 +163,7 @@
             <h3>Dokumen Kelompok 3</h3>
             <p>Ringkasan singkat dokumen 3</p>
             <div class="card-actions">
-              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok3.pdf" data-kode="3" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline" href="./Pdf/PPTKelompok3.pdf" download target="_blank">Unduh PDF</a>
             </div>
             <!-- Member Avatars Group 3 -->
             <div class="member-avatars">
@@ -180,7 +179,7 @@
             <h3>Dokumen Kelompok 4</h3>
             <p>Ringkasan singkat dokumen 4</p>
             <div class="card-actions">
-              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok4.pdf" data-kode="4" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline" href="./Pdf/PPTKelompok4.pdf" download target="_blank">Unduh PDF</a>
             </div>
             <!-- Member Avatars Group 4 -->
             <div class="member-avatars">
@@ -196,7 +195,7 @@
             <h3>Dokumen Kelompok 5</h3>
             <p>Ringkasan singkat dokumen 5</p>
             <div class="card-actions">
-              <a class="btn-outline secure-btn" href="./Pdf/PPTKelompok5.pdf" data-kode="5" download target="_blank">Unduh PDF</a>
+              <a class="btn-outline" href="./Pdf/PPTKelompok5.pdf" download target="_blank">Unduh PDF</a>
             </div>
             <!-- Member Avatars Group 5 -->
             <div class="member-avatars">
@@ -232,25 +231,19 @@
          POPUP MODAL
          Purpose: Display notifications and error messages to user
     ============================================ -->
-    <!-- TAMBAHIN POPUP KODE KELOMPOK SEBELUM </body> -->
-<div id="kodePopup" class="popup hidden">
-  <div class="popup-content">
-    <span id="kodePopupClose" class="popup-close">&times;</span>
-    <h3>Masukkan Kode Kelompok</h3>
-    <p id="kodePopupText">Untuk mengakses file ini</p>
-    
-    <input type="text" id="kodeInput" placeholder="Masukkan Kode" style="width: 100%; padding: 10px; margin: 10px 0; text-align: center;">
-    <button id="kodeSubmitBtn" class="btn-outline" style="width:100%">Buka</button>
-    <p id="kodeError"></p>
+    <div id="popup" class="popup hidden">
+      <div class="popup-content">
+        <span class="popup-close">&times;</span>
+        <p id="popup-text">file belum bisa di akses</p>
+      </div>
+    </div>
   </div>
-</div>
   
   <!-- ============================================
        THEME INITIALIZATION SCRIPT
        Purpose: Apply saved theme preference from localStorage on page load
   ============================================ -->
   <script>
-
     (function() {
       const saved = localStorage.getItem('site-theme');
       if (saved === 'light') {
